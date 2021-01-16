@@ -80,5 +80,5 @@ module.exports = (app, plugin, model) => {
 
     res.send(requestResult(comment))
   })
-  app.use('/admin/api', router)
+  app.use('/admin', router)
 }

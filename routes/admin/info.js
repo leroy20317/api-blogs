@@ -48,5 +48,5 @@ module.exports = (app, plugin, model) => {
     }
   })
 
-  app.use('/admin/api', router)
+  app.use('/admin', router)
 }

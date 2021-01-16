@@ -207,5 +207,5 @@ module.exports = (app, plugin, model) => {
         res.send(requestResult(result))
     })
 
-    app.use('/web/api', router)
+    app.use('/web', router)
 }

@@ -25,5 +25,5 @@ module.exports = (app, plugin, model) => {
     res.send(requestResult(result))
   })
 
-  app.use('/admin/api', router)
+  app.use('/admin', router)
 }

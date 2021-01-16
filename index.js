@@ -23,7 +23,7 @@ app.use('/uploads', express.static(isDev ? __dirname + '/uploads' : '/wwwroot/st
 app.use(expressJwt({
   secret: "Leroy"
 }).unless({
-  path: ["/admin/api/login", "/admin/api/user"]
+  path: ["/admin/login", "/admin/user"]
 }));
 
 // 中间件
