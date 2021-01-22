@@ -113,7 +113,8 @@ module.exports = (app, plugin, model) => {
         res.json({
           status: 100,
           msg: '上传成功',
-          url: url
+          url: url,
+          filename: req.file.filename
         });
       }).catch(function (err) {
         fs.unlinkSync(localFile);
@@ -187,7 +188,8 @@ module.exports = (app, plugin, model) => {
         res.json({
           status: 100,
           msg: '上传成功',
-          url: `https://cdn.leroy.net.cn/${key}`
+          url: `https://cdn.leroy.net.cn/${key}`,
+          filename: req.file.filename
         });
       }).catch(err => {
         res.json({
@@ -202,7 +204,8 @@ module.exports = (app, plugin, model) => {
       res.json({
         status: 100,
         msg: '上传成功',
-        url: isDev ? `/${filePath}` : filePath.replace('/wwwroot/static', '')
+        url: isDev ? `/${filePath}` : filePath.replace('/wwwroot/static', ''),
+        filename: req.file.filename
       });
     }
   })

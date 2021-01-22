@@ -48,7 +48,7 @@ module.exports = (app, plugin, model) => {
        */
       const data = {
         name: 'articleId',
-        count: 1103
+        count: 10001
       }
       const count = await Counter.create(data)
       req.body.data.id = count.count;
@@ -56,26 +56,6 @@ module.exports = (app, plugin, model) => {
     }
     res.send(requestResult(result))
 
-    // ...Subscribe
-    const email_data = req.body.email
-    if (email_data.subscribe && !result.hide) {
-      const sub = await Subscribe.find()
-      const email_list = sub.filter(i => i.active)
-
-      // 群发邮件
-      if (email_list.length > 0) {
-        const send_email = email_list.reduce((t, i) => {
-          t.push(i.email)
-          return t
-        }, [])
-        const data = {
-          title: result.title,
-          url: req.headers.origin + '/' + result.id,
-          email: send_email
-        }
-        email(2, data, email_data)
-      }
-    }
   })
 
   // 更新文章
