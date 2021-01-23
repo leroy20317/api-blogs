@@ -14,7 +14,6 @@ module.exports = (app, plugin, model) => {
       Comment.countDocuments(),
       Comment.find({status: 1}).countDocuments()
     ])
-    result[1].forEach(item => item._doc['time'] = dateFormat(item.time))
     result[2].forEach(item => item._doc['time'] = dateFormat(item.time))
 
     /**
