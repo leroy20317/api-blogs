@@ -17,6 +17,7 @@ module.exports = (app, plugin, model) => {
   // 获取指定id文章
   router.get('/article/:id', async (req, res) => {
     const data = await Article.findOne({id: req.params.id})
+    data['time'] = dateFormat(data['time']);
     res.send(requestResult(data))
   })
 
