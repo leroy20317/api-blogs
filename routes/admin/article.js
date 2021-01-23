@@ -15,8 +15,8 @@ module.exports = (app, plugin, model) => {
   })
 
   // 获取指定id文章
-  router.get('/article/:id', async (req, res) => {
-    const data = await Article.findOne({id: req.params.id})
+  router.get('/article/:_id', async (req, res) => {
+    const data = await Article.findById(req.params._id)
     res.send(requestResult(data))
   })
 
@@ -39,8 +39,8 @@ module.exports = (app, plugin, model) => {
     let result = null;
     if (articleId) {
       // 自定义id
-      req.body.data.id = articleId.count;
-      result = await Article.create(req.body.data)
+      req.body.id = articleId.count;
+      result = await Article.create(req.body)
     } else {
       /**
        * 第一次发表文章
@@ -51,28 +51,28 @@ module.exports = (app, plugin, model) => {
         count: 10001
       }
       const count = await Counter.create(data)
-      req.body.data.id = count.count;
-      result = await Article.create(req.body.data)
+      req.body.id = count.count;
+      result = await Article.create(req.body)
     }
-    res.send(requestResult(result))
+    res.send(requestResult(result, '发布成功'))
 
   })
 
   // 更新文章
-  router.post('/article/:id', async (req, res) => {
+  router.post('/article/:_id', async (req, res) => {
     const data = await Article.findByIdAndUpdate(
-        req.params.id,
-        req.body.data,
+        req.params._id,
+        req.body,
         (err, doc) => {
           return doc
         })
-    res.send(requestResult(data))
+    res.send(requestResult(data, '更新成功'))
   })
 
   // 删除文章
-  router.delete('/article/:id', async (req, res) => {
-    const data = await Article.findByIdAndDelete(req.params.id, req.body)
-    res.send(requestResult(data))
+  router.delete('/article/:_id', async (req, res) => {
+    const data = await Article.findByIdAndDelete(req.params._id, req.body)
+    res.send(requestResult(data, '删除成功'))
   })
 
   app.use('/admin', router)

@@ -1,17 +1,17 @@
 /**
  * 请求结果 统一处理返回值
  */
-function requestResult(data) {
+function requestResult(data, message) {
   if (data) {
     return {
-      status: 1,
-      message: 'success',
+      status: 'success',
+      message,
       body: data
     }
   } else {
     return {
-      status: 2,
-      message: 'error',
+      status: 'error',
+      message,
       body: data
     }
   }

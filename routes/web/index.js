@@ -40,8 +40,6 @@ module.exports = (app, plugin, model) => {
             Article.find({hide: false}).sort({time: -1}).limit(Number(10)).skip(Number(10) * (page - 1))
         ])
 
-        result[1].forEach(item => item._doc['time'] = dateFormat(item.time))
-
         // 列表页 分组
         if (req.query.from) {
             result[1] = result[1].reduce((total, item) => {
@@ -79,7 +77,6 @@ module.exports = (app, plugin, model) => {
         })
 
         if (data) {
-            data._doc['time'] = dateFormat(data.time)
             res.send(requestResult(data))
         } else {
             res.send(requestResult())
@@ -93,7 +90,6 @@ module.exports = (app, plugin, model) => {
 
         // 一级评论和子级评论格式转化
         const data = result.reduce((total, item, index, arr) => {
-            item._doc['time'] = dateFormat(item.time)
             if (item.type === 1) {
                 item._doc['child'] = []
                 total.push(item)
@@ -144,7 +140,6 @@ module.exports = (app, plugin, model) => {
         if (result.type === 1) {
             result._doc['child'] = [];
         }
-        result._doc['time'] = dateFormat(result.time)
 
         res.send(requestResult(result))
 
@@ -186,9 +181,6 @@ module.exports = (app, plugin, model) => {
             Envelope.find().sort({time: -1}).limit(Number(10)).skip(Number(10) * (page - 1))
         ])
 
-        result[1].forEach(item => {
-            item._doc['time'] = time(item.time)
-        })
         /**
          * 数据
          * 当前页

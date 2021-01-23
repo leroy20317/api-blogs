@@ -50,13 +50,13 @@ module.exports = (app, plugin, model) => {
           expiresIn: 60 * 60 * 24  // 24小时过期
         });
         res.json({
-          status: 1,
+          status: 'success',
           message: '登录成功',
           token: token
         })
       } else {
         res.json({
-          status: 2,
+          status: 'error',
           message: '用户名或密码错误！'
         })
       }
@@ -73,7 +73,7 @@ module.exports = (app, plugin, model) => {
     }
     if (len) {
       res.json({
-        status: 2,
+        status: 'error',
         message: '请勿重复注册, 如遗忘密码, 自行操作数据库处理!',
       })
     } else {
@@ -81,12 +81,12 @@ module.exports = (app, plugin, model) => {
       await User.create(info, (err, docs) => {
         if (docs.length != 0) {
           res.json({
-            status: 1,
+            status: 'success',
             message: '账号创建成功'
           })
         } else {
           res.json({
-            status: 2,
+            status: 'error',
             message: '创建失败,请检查数据库or服务器是否正常'
           })
         }

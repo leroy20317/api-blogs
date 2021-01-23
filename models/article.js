@@ -7,7 +7,7 @@ const schema = new mongoose.Schema({
   id: Number,
   title: String,                      // 标题
   words: Number,                      // 字数
-  content: String,                    // 内容
+  content: String,                    // md内容
   describe: String,                   // 描述
   contentHtml: String,                // 内容源码
   time: String,

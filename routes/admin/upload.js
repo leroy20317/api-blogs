@@ -84,8 +84,8 @@ module.exports = (app, plugin, model) => {
       if (Object.keys(oss).length < 5) {
         fs.unlinkSync(localFile);
         res.json({
-          status: '101',
-          msg: '请填写正确的OSS'
+          status: 'error',
+          message: '请填写正确的OSS'
         });
         return;
       }
@@ -111,16 +111,18 @@ module.exports = (app, plugin, model) => {
 
         fs.unlinkSync(localFile);   // 上传之后删除本地文件
         res.json({
-          status: 100,
-          msg: '上传成功',
-          url: url,
-          filename: req.file.filename
+          status: 'success',
+          message: '上传成功',
+          body: {
+            url: url,
+            filename: req.file.filename
+          }
         });
       }).catch(function (err) {
         fs.unlinkSync(localFile);
         res.json({
-          status: '101',
-          msg: '上传失败',
+          status: 'error',
+          message: '上传失败',
           error: JSON.stringify(err)
         });
       });
@@ -186,26 +188,30 @@ module.exports = (app, plugin, model) => {
       }).then(function () {
         console.log(`上传文件至https://cdn.leroy.net.cn/${key}成功`);
         res.json({
-          status: 100,
-          msg: '上传成功',
-          url: `https://cdn.leroy.net.cn/${key}`,
-          filename: req.file.filename
+          status: 'success',
+          message: '上传成功',
+          body: {
+            url: `https://cdn.leroy.net.cn/${key}`,
+            filename: req.file.filename
+          }
         });
       }).catch(err => {
         res.json({
-          status: '101',
-          msg: '上传失败',
-          error: JSON.stringify(err)
+          status: 'error',
+          message: '上传失败',
+          body: JSON.stringify(err)
         });
       });
 
     } else {
       const filePath = (req.file.path).replace(/\\/g, "\/");
       res.json({
-        status: 100,
-        msg: '上传成功',
-        url: isDev ? `/${filePath}` : filePath.replace('/wwwroot/static', ''),
-        filename: req.file.filename
+        status: 'success',
+        message: '上传成功',
+        body: {
+          url: isDev ? `/${filePath}` : filePath.replace('/wwwroot/static', ''),
+          filename: req.file.filename
+        }
       });
     }
   })
@@ -240,8 +246,8 @@ module.exports = (app, plugin, model) => {
         client.useBucket(ali_oss.bucket);
         const result = yield client.delete(key);
         res.json({
-          status: 100,
-          msg: '删除成功'
+          status: 'success',
+          message: '删除成功'
         });
       })
     } else if (type === '2'){
@@ -263,8 +269,8 @@ module.exports = (app, plugin, model) => {
           console.log(respInfo);
 
           res.json({
-            status: 100,
-            msg: '删除成功'
+            status: 'success',
+            message: '删除成功'
           });
         }
       });
@@ -272,8 +278,8 @@ module.exports = (app, plugin, model) => {
     } else {
       fs.unlinkSync(isDev ? `./${localFile}` : `/wwwroot/static/${localFile}`);
       res.json({
-        status: 100,
-        msg: '删除成功'
+        status: 'success',
+        message: '删除成功'
       });
     }
   })

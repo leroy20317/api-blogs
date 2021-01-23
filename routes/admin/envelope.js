@@ -3,13 +3,13 @@ module.exports = (app, plugin, model) => {
   const router = express.Router();
 
   let {Envelope} = model
-  let {dateFormat} = plugin
+  let {getPage} = plugin
 
   router.get('/envelope', async (req, res) => {
-    const data = await Envelope.find({}).sort({time: -1}).limit(100)
+    const p = req.query.page || 1;
+    const s = req.query.count || 10;
 
-    data.forEach(item => item._doc['time'] = dateFormat(item.time))
-
+    const data = await getPage(Envelope, p, s)
     res.send(data)
   })
 
@@ -28,7 +28,6 @@ module.exports = (app, plugin, model) => {
 
   router.get('/envelope/:id', async (req, res) => {
     const data = await Envelope.findById(req.params.id, req.body)
-    // data._doc['time'] = dateFormat(data.time);
     res.send(data)
   })
 

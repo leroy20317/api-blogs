@@ -5,6 +5,16 @@ module.exports = (app, plugin, model) => {
   let {Info, Comment, Counter, Article, Envelope} = model
   let {dateFormat, requestResult} = plugin
 
+  router.get('/user-info', async (req, res) => {
+    const result = await Info.findOne()
+
+    /**
+     * 个人信息
+     */
+
+    res.send(requestResult(result))
+  })
+
   router.get('/info', async (req, res) => {
     const result = await Promise.all([
       Info.findOne(),
@@ -14,7 +24,6 @@ module.exports = (app, plugin, model) => {
       Comment.countDocuments(),
       Comment.find({status: 1}).countDocuments()
     ])
-    result[2].forEach(item => item._doc['time'] = dateFormat(item.time))
 
     /**
      * 个人信息
