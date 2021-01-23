@@ -3,7 +3,7 @@ module.exports = (app, plugin, model) => {
   const router = express.Router();
 
   let {Counter, Article, Subscribe} = model
-  let {getPage, requestResult, email} = plugin
+  let {getPage, requestResult, dateFormat, email} = plugin
 
   // 获取文章
   router.get('/article', async (req, res) => {
