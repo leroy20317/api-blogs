@@ -23,14 +23,15 @@ module.exports = (app, plugin, model) => {
         Comment.deleteOne({id}, (err, doc) => doc ? resolve(doc) : reject())
       })
     ]
-    // 删除所有子评论
+
+    // 当前为一级评论则删除所有子评论
     if (!req.body.parent_id) {
       total.push(new Promise((resolve, reject) => {
         Comment.deleteMany({parent_id: id}, (err, doc) => doc ? resolve(doc) : reject())
       }))
     }
     Promise.all(total).then(resolve => {
-      res.send(requestResult(resolve[0]))
+      res.send(requestResult(resolve[0], '操作成功'))
     }).catch(err => {
       res.send(requestResult())
     })
@@ -47,23 +48,11 @@ module.exports = (app, plugin, model) => {
     })
 
     // 添加评论id
-    req.body.data.id = commentCount.count;
-    const result = await Comment.create(req.body.data)
+    req.body.id = commentCount.count;
+    const result = await Comment.create(req.body)
 
     res.send(requestResult(result))
 
-    // 邮件信息
-    if (req.body.email.comment) {
-      const articleData = await Article.findOne({id: req.body.data.topic_id})
-      const data = {
-        title: articleData.title,
-        url: req.body.email.web_address + '/' + req.body.data.topic_id,
-        name: req.body.data.reply_name,
-        email: req.body.data.reply_email
-      }
-      // 发送邮件
-      email(3, data, req.body.email)
-    }
   })
 
   // 一键已读
@@ -78,7 +67,7 @@ module.exports = (app, plugin, model) => {
       return doc;
     })
 
-    res.send(requestResult(comment))
+    res.send(requestResult(comment, '操作成功!'))
   })
   app.use('/admin', router)
 }

@@ -23,8 +23,6 @@ module.exports = (app, plugin, model) => {
                 email_name: info.email.name,
                 email_comment: info.email.comment,
                 admin_mark: info.email.mark,
-
-                email_subscribe: info.email.subscribe,
             }
         }
 
@@ -141,24 +139,8 @@ module.exports = (app, plugin, model) => {
             result._doc['child'] = [];
         }
 
-        res.send(requestResult(result))
+        res.send(requestResult(result, '评论成功！'))
 
-        /**
-         * 发送邮件通知
-         */
-        if (req.body.is_email) {
-            const info = await Info.findOne()
-            const data = {
-                title: req.body.title,
-                url: req.body.url,
-                name: req.body.data.reply_name || info.email.name,
-                email: req.body.data.reply_email || info.email.address
-            }
-
-            // 发送邮件
-            const email_info = Object.assign({}, info['email'], {web_name: info['web_name']})
-            email(3, data, email_info)
-        }
     })
 
     // like +1

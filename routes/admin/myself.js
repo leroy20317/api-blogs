@@ -13,10 +13,10 @@ module.exports = (app, plugin, model) => {
           (err, doc) => {
             return doc
           })
-      res.send(requestResult(result))
+      res.send(requestResult(result, '更新成功！'))
     } else {
       const result = await Myself.create(req.body)
-      res.send(requestResult(result))
+      res.send(requestResult(result, '填写成功！'))
     }
   })
 
