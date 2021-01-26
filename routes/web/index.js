@@ -17,7 +17,7 @@ module.exports = (app, plugin, model) => {
                 web_seo: info.web_seo,
                 web_name: info.web_name,
                 web_describe: info.web_describe,
-                bg: info.bg,
+                music: info.music,
 
                 email: info.email.address,
                 email_name: info.email.name,

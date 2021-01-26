@@ -2,8 +2,8 @@ module.exports = (app, plugin, model) => {
   const express = require('express');
   const router = express.Router();
 
-  let {Counter, Article, Subscribe} = model
-  let {getPage, requestResult, dateFormat, email} = plugin
+  let {Counter, Article} = model
+  let {getPage, requestResult} = plugin
 
   // 获取文章
   router.get('/article', async (req, res) => {
@@ -28,7 +28,7 @@ module.exports = (app, plugin, model) => {
     const articleId = await Counter.findOneAndUpdate({
       name: 'articleId'
     }, {
-      $inc: {'count': 11}
+      $inc: {'count': 1}
     }, {
       new: true
     })
