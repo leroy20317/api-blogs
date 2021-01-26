@@ -6,179 +6,203 @@ module.exports = (app, plugin, model) => {
     let {time, email, dateFormat, requestResult} = plugin
 
     router.get('/info', async (req, res) => {
-        const info = await Info.findOne()
+        try {
+            const info = await Info.findOne()
+            let data = null;
+            if (info) {
+                data = {
+                    cover: info.cover,
+                    avatar: info.avatar,
+                    web_seo: info.web_seo,
+                    web_name: info.web_name,
+                    web_describe: info.web_describe,
+                    music: info.music,
 
-        let data = null;
-
-        if (info) {
-            data = {
-                cover: info.cover,
-                avatar: info.avatar,
-                web_seo: info.web_seo,
-                web_name: info.web_name,
-                web_describe: info.web_describe,
-                music: info.music,
-
-                email: info.email.address,
-                email_name: info.email.name,
-                email_comment: info.email.comment,
-                admin_mark: info.email.mark,
+                    email: info.email.address,
+                    email_name: info.email.name,
+                    email_comment: info.email.comment,
+                    admin_mark: info.email.mark,
+                }
             }
+            res.send(requestResult(data, 'success'))
+        }catch (e) {
+            res.send(requestResult(e, 'error'))
         }
-
-        res.send(requestResult(data))
     })
 
     // All articles
     router.get('/article', async (req, res) => {
         const page = req.query.page || 1;
 
-        const result = await Promise.all([
-            Article.countDocuments(),
-            Article.find({hide: false}).sort({time: -1}).limit(Number(10)).skip(Number(10) * (page - 1))
-        ])
+        try {
+            const result = await Promise.all([
+                Article.countDocuments(),
+                Article.find({hide: false}).sort({time: -1}).limit(Number(10)).skip(Number(10) * (page - 1))
+            ])
 
-        // 列表页 分组
-        if (req.query.from) {
-            result[1] = result[1].reduce((total, item) => {
-                const [, year, date] = /(\d+)\/(\d+)/.exec(item.time.date);
-                total['_' + year] = total['_' + year] || {};
-                total['_' + year][date] = total['_' + year][date] || [];
-                total['_' + year][date].push(item);
-                return total
-            }, {})
+            // 列表页 分组
+            if (req.query.from) {
+                result[1] = result[1].reduce((total, item) => {
+                    const [, year, date] = /(\d+)\/(\d+)/.exec(item.time.date);
+                    total['_' + year] = total['_' + year] || {};
+                    total['_' + year][date] = total['_' + year][date] || [];
+                    total['_' + year][date].push(item);
+                    return total
+                }, {})
+            }
+
+            /**
+             * 数据
+             * 当前页
+             * 总页数
+             */
+            const data = {
+                data: result[1],
+                page: Number(page),
+                totalPage: Math.ceil(result[0] / 10),
+            }
+
+            res.send(requestResult(data, 'success'))
+        }catch (e) {
+            res.send(requestResult(e, 'error'))
         }
-
-        /**
-         * 数据
-         * 当前页
-         * 总页数
-         */
-        const data = {
-            data: result[1],
-            page: Number(page),
-            totalPage: Math.ceil(result[0] / 10),
-        }
-
-        res.send(requestResult(data))
     })
 
     // Get article
     router.get('/article/:id', async (req, res) => {
-        const id = Number(req.params.id)
-        const data = await Article.findOneAndUpdate({
-            id: id
-        }, {
-            $inc: {'read': 1}
-        }, {
-            new: true
-        })
+        try {
+            const id = Number(req.params.id)
+            const data = await Article.findOneAndUpdate({
+                id: id
+            }, {
+                $inc: {'read': 1}
+            }, {
+                new: true
+            })
 
-        if (data) {
-            res.send(requestResult(data))
-        } else {
-            res.send(requestResult())
+            res.send(requestResult(data || null, 'success'))
+        }catch (e) {
+            res.send(requestResult(e, 'error'))
         }
     })
 
     // Get comment
     router.get('/comment/:id', async (req, res) => {
-        const id = Number(req.params.id)
-        const result = await Comment.find({topic_id: id})
+        try {
+            const id = Number(req.params.id)
+            const result = await Comment.find({topic_id: id})
 
-        // 一级评论和子级评论格式转化
-        const data = result.reduce((total, item, index, arr) => {
-            if (item.type === 1) {
-                item._doc['child'] = []
-                total.push(item)
-            } else {
-                total.forEach(i => {
-                    if (i.id === item.parent_id) {
-                        i._doc['child'].push(item)
-                    }
-                })
-            }
-            return total
-        }, []).reverse()
+            // 一级评论和子级评论格式转化
+            const data = result.reduce((total, item, index, arr) => {
+                if (item.type === 1) {
+                    item._doc['child'] = []
+                    total.push(item)
+                } else {
+                    total.forEach(i => {
+                        if (i.id === item.parent_id) {
+                            i._doc['child'].push(item)
+                        }
+                    })
+                }
+                return total
+            }, []).reverse()
 
-        const total = result.length;
+            const total = result.length;
 
-        res.send(requestResult({data, total}))
+            res.send(requestResult({data, total}, 'success'))
+        }catch (e) {
+            res.send(requestResult(e, 'error'))
+        }
     })
 
     // Post a comment
     router.post('/comment', async (req, res) => {
-        const commentCount = await Counter.findOneAndUpdate({
-            name: 'comment'
-        }, {
-            $inc: {'count': 1}
-        }, {
-            new: true
-        })
 
-        if (commentCount) {
-            req.body.data.id = commentCount.count;
-        } else {
-            /**
-             * 第一次发表评论
-             * 创建自增id字段
-             */
-            const data = {
-                name: 'comment',
-                count: 1
+        try {
+            const commentCount = await Counter.findOneAndUpdate({
+                name: 'comment'
+            }, {
+                $inc: {'count': 1}
+            }, {
+                new: true
+            })
+
+            if (commentCount) {
+                req.body.data.id = commentCount.count;
+            } else {
+                /**
+                 * 第一次发表评论
+                 * 创建自增id字段
+                 */
+                const data = {
+                    name: 'comment',
+                    count: 1
+                }
+                const count = await Counter.create(data)
+                req.body.data.id = count.count;
             }
-            const count = await Counter.create(data)
-            req.body.data.id = count.count;
+
+            /**
+             * 返回评论数据，页面展示
+             */
+            const result = await Comment.create(req.body.data)
+            if (result.type === 1) {
+                result._doc['child'] = [];
+            }
+
+            res.send(requestResult(result, 'success', '评论成功！'))
+        }catch (e) {
+            res.send(requestResult(e, 'error'))
         }
-
-        /**
-         * 返回评论数据，页面展示
-         */
-        const result = await Comment.create(req.body.data)
-        if (result.type === 1) {
-            result._doc['child'] = [];
-        }
-
-        res.send(requestResult(result, '评论成功！'))
-
     })
 
     // like +1
     router.put('/article_like/:id', async (req, res) => {
-        let data = await Article.updateOne({
-            '_id': req.params.id
-        }, {
-            $inc: {'like': 1}
-        })
-        res.send(data)
+        try {
+            const data = await Article.updateOne({
+                '_id': req.params.id
+            }, {
+                $inc: {'like': 1}
+            })
+            res.send(requestResult(data, 'success', '点赞成功！'))
+        }catch (e) {
+            res.send(requestResult(e, 'error'))
+        }
     })
 
     // envelope
     router.get('/envelope', async (req, res) => {
+        try {
+            const page = req.query.page || 1;
 
-        const page = req.query.page || 1;
+            const result = await Promise.all([
+                Envelope.countDocuments(),
+                Envelope.find().sort({time: -1}).limit(Number(10)).skip(Number(10) * (page - 1))
+            ])
 
-        const result = await Promise.all([
-            Envelope.countDocuments(),
-            Envelope.find().sort({time: -1}).limit(Number(10)).skip(Number(10) * (page - 1))
-        ])
-
-        /**
-         * 数据
-         * 当前页
-         * 总页数
-         */
-        const data = {
-            data: result[1],
-            page: Number(page),
-            totalPage: Math.ceil(result[0] / 10),
+            /**
+             * 数据
+             * 当前页
+             * 总页数
+             */
+            const data = {
+                data: result[1],
+                page: Number(page),
+                totalPage: Math.ceil(result[0] / 10),
+            }
+            res.send(requestResult(data, 'success'))
+        }catch (e) {
+            res.send(requestResult(e, 'error'))
         }
-        res.send(requestResult(data))
     })
 
     router.get('/myself', async (req, res) => {
-        const result = await Myself.findOne()
-        res.send(requestResult(result))
+        try {
+            const result = await Myself.findOne()
+            res.send(requestResult(result, 'success'))
+        }catch (e) {
+            res.send(requestResult(e, 'error'))
+        }
     })
 
     app.use('/web', router)

@@ -25,10 +25,10 @@ module.exports = (app, plugin, model) => {
             password: passwords
           }
         }, (err, doc) => {
-          res.send(requestResult(doc))
+          res.send(requestResult(doc, 'success', '修改成功！'))
         })
       } else {
-        res.send(requestResult(docs))
+        res.send(requestResult(docs, 'error'))
       }
     })
   })
@@ -51,7 +51,7 @@ module.exports = (app, plugin, model) => {
         });
         res.json({
           status: 'success',
-          message: '登录成功',
+          message: '登录成功！',
           token: token
         })
       } else {
@@ -82,12 +82,12 @@ module.exports = (app, plugin, model) => {
         if (docs.length != 0) {
           res.json({
             status: 'success',
-            message: '账号创建成功'
+            message: '账号创建成功！'
           })
         } else {
           res.json({
             status: 'error',
-            message: '创建失败,请检查数据库or服务器是否正常'
+            message: '创建失败,请检查数据库or服务器是否正常！'
           })
         }
       })

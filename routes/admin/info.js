@@ -6,48 +6,47 @@ module.exports = (app, plugin, model) => {
   let {dateFormat, requestResult} = plugin
 
   router.get('/info', async (req, res) => {
-    const result = await Info.findOne()
-
-    /**
-     * 个人信息
-     */
-
-    res.send(requestResult(result))
+    try {
+      const result = await Info.findOne()
+      res.send(requestResult(result, 'success'))
+    }catch (e) {
+      res.send(requestResult(e, 'error'))
+    }
   })
 
   router.get('/dashboard', async (req, res) => {
-    /**
-     * 文章列表
-     * 短语列表
-     * 文章总数
-     * 评论总数量
-     * 评论未读数量
-     */
-    const result = await Promise.all([
-      Article.findOne().sort({time: -1}),
-      Article.countDocuments(),
-      Comment.countDocuments(),
-      Comment.find({status: 1}).countDocuments(),
-      Envelope.find().sort({time: -1}).limit(8),
-    ])
 
-    const data = {
-      article: {
-        last: result[0],
-        length: result[1]
-      },
-      comment: {
-        length: result[2],
-        unread: result[3],
-      },
-      envelope: result[4],
+    try {
+      /**
+       * 文章列表
+       * 短语列表
+       * 文章总数
+       * 评论总数量
+       * 评论未读数量
+       */
+      const result = await Promise.all([
+        Article.findOne().sort({time: -1}),
+        Article.countDocuments(),
+        Comment.countDocuments(),
+        Comment.find({status: 1}).countDocuments(),
+        Envelope.find().sort({time: -1}).limit(8),
+      ])
+
+      const data = {
+        article: {
+          last: result[0],
+          length: result[1]
+        },
+        comment: {
+          length: result[2],
+          unread: result[3],
+        },
+        envelope: result[4],
+      }
+      res.send(requestResult(data, 'success'))
+    }catch (e) {
+      res.send(requestResult(e, 'error'))
     }
-
-    /**
-     * 个人信息
-     */
-
-    res.send(requestResult(data))
   })
 
 
@@ -80,17 +79,21 @@ module.exports = (app, plugin, model) => {
   // })
 
   router.post('/info', async (req, res) => {
-    if (req.body._id) {
-      const result = await Info.findByIdAndUpdate(
-          req.body._id,
-          req.body,
-          (err, doc) => {
-            return doc
-          })
-      res.send(requestResult(result, '更新成功！'))
-    } else {
-      const result = await Info.create(req.body)
-      res.send(requestResult(result, '创建成功！'))
+    try {
+      if (req.body._id) {
+        const result = await Info.findByIdAndUpdate(
+            req.body._id,
+            req.body,
+            (err, doc) => {
+              return doc
+            })
+        res.send(requestResult(result, 'success', '更新成功！'))
+      } else {
+        const result = await Info.create(req.body)
+        res.send(requestResult(result, 'success', '创建成功！'))
+      }
+    }catch (e) {
+      res.send(requestResult(e, 'error'))
     }
   })
 

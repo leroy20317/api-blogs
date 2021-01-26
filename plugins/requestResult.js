@@ -1,8 +1,8 @@
 /**
  * 请求结果 统一处理返回值
  */
-function requestResult(data, message) {
-  if (data) {
+function requestResult(data, status, message) {
+  if (status === 'success') {
     return {
       status: 'success',
       message,
@@ -12,7 +12,7 @@ function requestResult(data, message) {
     return {
       status: 'error',
       message,
-      body: data
+      error: data
     }
   }
 }

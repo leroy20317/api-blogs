@@ -11,8 +11,12 @@ module.exports = (app, plugin, model) => {
     const p = req.query.page || 1;
     const s = req.query.count || 10;
 
-    const data = await getPage(Comment, p, s)
-    res.send(requestResult(data))
+    try {
+      const data = await getPage(Comment, p, s)
+      res.send(requestResult(data, 'success'))
+    }catch (e) {
+      res.send(requestResult(e, 'error'))
+    }
   })
 
   // Delete
@@ -31,43 +35,49 @@ module.exports = (app, plugin, model) => {
       }))
     }
     Promise.all(total).then(resolve => {
-      res.send(requestResult(resolve[0], '操作成功'))
+      res.send(requestResult(resolve[0], 'success', '操作成功！'))
     }).catch(err => {
-      res.send(requestResult())
+      res.send(requestResult(err, 'error'))
     })
   })
 
   // Reply
   router.post('/comment', async (req, res) => {
-    const commentCount = await Counter.findOneAndUpdate({
-      name: 'comment'
-    }, {
-      $inc: {'count': 1}
-    }, {
-      new: true
-    })
+    try {
+      const commentCount = await Counter.findOneAndUpdate({
+        name: 'comment'
+      }, {
+        $inc: {'count': 1}
+      }, {
+        new: true
+      })
 
-    // 添加评论id
-    req.body.id = commentCount.count;
-    const result = await Comment.create(req.body)
+      // 添加评论id
+      req.body.id = commentCount.count;
+      const result = await Comment.create(req.body)
 
-    res.send(requestResult(result))
-
+      res.send(requestResult(result, 'success', '回复成功！'))
+    }catch (e) {
+      res.send(requestResult(e, 'error'))
+    }
   })
 
   // 一键已读
   router.post('/comment_read', async (req, res) => {
-    const comment = await Comment.updateMany({
-      status: 1
-    }, {
-      $set: {status: 2}
-    }, {
-      multi: true
-    }, (err, doc) => {
-      return doc;
-    })
-
-    res.send(requestResult(comment, '操作成功!'))
+    try {
+      const comment = await Comment.updateMany({
+        status: 1
+      }, {
+        $set: {status: 2}
+      }, {
+        multi: true
+      }, (err, doc) => {
+        return doc;
+      })
+      res.send(requestResult(comment, 'success', '操作成功!'))
+    }catch (e) {
+      res.send(requestResult(e, 'error'))
+    }
   })
   app.use('/admin', router)
 }

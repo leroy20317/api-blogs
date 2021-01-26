@@ -1,5 +1,5 @@
 /* 
- * 自增id +11
+ * 自增id +1
 */
 const mongoose = require('mongoose');
 
