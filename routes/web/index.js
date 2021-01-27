@@ -8,23 +8,7 @@ module.exports = (app, plugin, model) => {
     router.get('/info', async (req, res) => {
         try {
             const info = await Info.findOne()
-            let data = null;
-            if (info) {
-                data = {
-                    cover: info.cover,
-                    avatar: info.avatar,
-                    web_seo: info.web_seo,
-                    web_name: info.web_name,
-                    web_describe: info.web_describe,
-                    music: info.music,
-
-                    email: info.email.address,
-                    email_name: info.email.name,
-                    email_comment: info.email.comment,
-                    admin_mark: info.email.mark,
-                }
-            }
-            res.send(requestResult(data, 'success'))
+            res.send(requestResult(info, 'success'))
         }catch (e) {
             res.send(requestResult(e, 'error'))
         }
@@ -34,38 +18,38 @@ module.exports = (app, plugin, model) => {
     router.get('/article', async (req, res) => {
         const page = req.query.page || 1;
 
-        try {
-            const result = await Promise.all([
+            Promise.all([
                 Article.countDocuments(),
                 Article.find({hide: false}).sort({time: -1}).limit(Number(10)).skip(Number(10) * (page - 1))
-            ])
+            ]).then(result => {
+                // 列表页 分组
+                if (req.query.from) {
+                    result[1] = result[1].reduce((total, item) => {
+                        const [year, month] = item.time.split(/[-|\-|\/| | |:]/);
+                        total['_' + year] = total['_' + year] || {};
+                        total['_' + year][month] = total['_' + year][month] || [];
+                        total['_' + year][month].push(item);
+                        return total
+                    }, {})
+                }
 
-            // 列表页 分组
-            if (req.query.from) {
-                result[1] = result[1].reduce((total, item) => {
-                    const [, year, date] = /(\d+)\/(\d+)/.exec(item.time.date);
-                    total['_' + year] = total['_' + year] || {};
-                    total['_' + year][date] = total['_' + year][date] || [];
-                    total['_' + year][date].push(item);
-                    return total
-                }, {})
-            }
 
-            /**
-             * 数据
-             * 当前页
-             * 总页数
-             */
-            const data = {
-                data: result[1],
-                page: Number(page),
-                totalPage: Math.ceil(result[0] / 10),
-            }
+                /**
+                 * 数据
+                 * 当前页
+                 * 总页数
+                 */
+                const data = {
+                    data: result[1],
+                    page: Number(page),
+                    totalPage: Math.ceil(result[0] / 10),
+                }
 
-            res.send(requestResult(data, 'success'))
-        }catch (e) {
-            res.send(requestResult(e, 'error'))
-        }
+                res.send(requestResult(data, 'success'))
+            }).catch(e => {
+                res.send(requestResult(e, 'error'))
+            })
+
     })
 
     // Get article
