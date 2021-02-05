@@ -10,4 +10,6 @@ $ npm install
 $ npm run dev
 
 # build for production and launch server
-$ npm run start
+$ npm run build 
+$ and
+$ nom run start
