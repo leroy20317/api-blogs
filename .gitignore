@@ -22,3 +22,7 @@ npm-debug.log
 
 # lock
 package-lock.json
+
+#env
+.development.env
+.production.env

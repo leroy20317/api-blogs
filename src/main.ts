@@ -1,9 +1,12 @@
 import {NestFactory} from '@nestjs/core';
 import {DocumentBuilder, SwaggerModule} from '@nestjs/swagger';
 import {AppModule} from './app.module';
-import config from './utils/config'
+import './utils/config'
 import {ValidationPipe} from "./pipe/validation.pipe";
 import * as compression from 'compression';
+
+const {NODE_ENV, HOST, PORT} = process.env;
+const isPro = NODE_ENV === 'production'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,7 +18,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe())
 
   // 文档
-  if (!config.isPro) {
+  if (!isPro) {
     const options = new DocumentBuilder()
         .addBearerAuth() // 开启 BearerAuth 授权认证
         .setTitle('接口文档')
@@ -29,7 +32,7 @@ async function bootstrap() {
   // 压缩
   app.use(compression());
 
-  await app.listen(config.port, config.host);
+  await app.listen(PORT, HOST);
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
 

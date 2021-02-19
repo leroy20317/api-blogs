@@ -11,11 +11,13 @@ import {FileInterceptor} from '@nestjs/platform-express';
 import {ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags} from "@nestjs/swagger";
 import FileDto from "./dto";
 import {diskStorage} from 'multer'
-import config from "../../utils/config";
 import {join} from 'path'
 import * as fs from "fs";
 import * as qiniu from 'qiniu';
 import {formatNow, Result} from "../../utils/util";
+
+const {NODE_ENV} = process.env;
+const isPro = NODE_ENV === 'production'
 
 const accessKey = 'yH-26a9NAohR_QegJR1uGU5I5Dw595l6n_tXHwPB';
 const secretKey = 'EcLCXW7hZiaY48qbFP1yU9okc17a12mmQqF9Ipth';
@@ -60,7 +62,10 @@ async function kodoUpload(filePath: string, fileUrl: string): Promise<any> {
 
 async function kodoDelete(fileUrl: string) {
   const mac = new qiniu.auth.digest.Mac(accessKey, secretKey);
-  const bucketManager = new qiniu.rs.BucketManager(mac, config);
+  const qiniu_config = new qiniu.conf.Config({
+    zone: qiniu.zone.Zone_z2, // 华南
+  });
+  const bucketManager = new qiniu.rs.BucketManager(mac, qiniu_config);
   return new Promise((resolve, reject) => {
     bucketManager.delete("leroy20317", fileUrl, function (err, respBody, respInfo) {
       if (err) {
@@ -88,7 +93,7 @@ export default class UploadController {
       destination: (req, file, cb) => {
         const name = file.mimetype.includes('image') ? 'image' : 'music';
         const date = formatNow().split(' ')[0]
-        const path = `${config.isPro ? '/wwwroot/static/uploads' : join(__dirname, '../../uploads')}/${name}/${date}`;
+        const path = `${isPro ? '/wwwroot/static/uploads' : join(__dirname, '../../uploads')}/${name}/${date}`;
         if (!fs.existsSync(path)) {
           fs.mkdirSync(path, {recursive: true});
         }
@@ -165,7 +170,7 @@ export default class UploadController {
     switch (type) {
       case "1":
         // 服务器
-        const filePath = `${config.isPro ? '/wwwroot/static/' : join(__dirname, '../../')}${fileUrl}`;
+        const filePath = `${isPro ? '/wwwroot/static/' : join(__dirname, '../../')}${fileUrl}`;
         fs.unlinkSync(filePath);
         return {
           status: 'success',
