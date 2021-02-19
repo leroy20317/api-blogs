@@ -1,7 +1,7 @@
 import {NestFactory} from '@nestjs/core';
 import {DocumentBuilder, SwaggerModule} from '@nestjs/swagger';
 import {AppModule} from './app.module';
-import './utils/config'
+import './utils/env'
 import {ValidationPipe} from "./pipe/validation.pipe";
 import * as compression from 'compression';
 

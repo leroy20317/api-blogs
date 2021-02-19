@@ -15,19 +15,18 @@ import {join} from 'path'
 import * as fs from "fs";
 import * as qiniu from 'qiniu';
 import {formatNow, Result} from "../../utils/util";
+import "../../utils/env"
 
-const {NODE_ENV} = process.env;
+const {NODE_ENV, ACCESSKEY, SECRETKEY} = process.env;
 const isPro = NODE_ENV === 'production'
 
-const accessKey = 'yH-26a9NAohR_QegJR1uGU5I5Dw595l6n_tXHwPB';
-const secretKey = 'EcLCXW7hZiaY48qbFP1yU9okc17a12mmQqF9Ipth';
+const mac = new qiniu.auth.digest.Mac(ACCESSKEY, SECRETKEY);
+const qiniu_config = new qiniu.conf.Config({
+  useCdnDomain: true, // cdn加速
+  zone: qiniu.zone.Zone_z2, // 华南
+});
 
 async function kodoUpload(filePath: string, fileUrl: string): Promise<any> {
-  const mac = new qiniu.auth.digest.Mac(accessKey, secretKey);
-  const qiniu_config = new qiniu.conf.Config({
-    useCdnDomain: true, // cdn加速
-    zone: qiniu.zone.Zone_z2, // 华南
-  });
 
   const options = {scope: 'leroy20317', expires: 7200};
   const putPolicy = new qiniu.rs.PutPolicy(options);
@@ -61,10 +60,6 @@ async function kodoUpload(filePath: string, fileUrl: string): Promise<any> {
 }
 
 async function kodoDelete(fileUrl: string) {
-  const mac = new qiniu.auth.digest.Mac(accessKey, secretKey);
-  const qiniu_config = new qiniu.conf.Config({
-    zone: qiniu.zone.Zone_z2, // 华南
-  });
   const bucketManager = new qiniu.rs.BucketManager(mac, qiniu_config);
   return new Promise((resolve, reject) => {
     bucketManager.delete("leroy20317", fileUrl, function (err, respBody, respInfo) {

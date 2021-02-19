@@ -2,7 +2,7 @@ import {Module} from '@nestjs/common';
 import {AdminModule} from './admin/admin.module';
 import {WebModule} from './web/web.module';
 import {TypegooseModule} from "nestjs-typegoose";
-import "./utils/config";
+import "./utils/env";
 import {APP_GUARD} from "@nestjs/core";
 import {RoleAuthGuard} from "./auth/guard";
 
