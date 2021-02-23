@@ -27,7 +27,9 @@
     ]
   },
   "husky": {
-    "pre-commit": "npm run lint"
+    "hooks": {
+      "pre-commit": "npm run lint"
+    }
   },
   "dependencies": {
     "@nestjs/common": "^7.6.7",
