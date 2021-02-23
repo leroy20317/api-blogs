@@ -1,13 +1,20 @@
 import {Injectable, Logger} from '@nestjs/common';
-import {Cron, CronExpression, Timeout} from "@nestjs/schedule";
+import {Cron, CronExpression} from '@nestjs/schedule';
 import '../utils/env';
 import * as childProcess from 'child_process';
-import {formatNow} from "../utils/util";
-import * as qiniu from "qiniu";
+import {formatNow} from '../utils/util';
+import * as qiniu from 'qiniu';
 
-const {exec} = childProcess
-const {NODE_ENV, MONGO_PORT, MONGO_HOST, MONGO_DB, ACCESSKEY, SECRETKEY} = process.env
-const isPro = NODE_ENV === 'production'
+const {exec} = childProcess;
+const {
+  NODE_ENV,
+  MONGO_PORT,
+  MONGO_HOST,
+  MONGO_DB,
+  ACCESSKEY,
+  SECRETKEY,
+} = process.env;
+const isPro = NODE_ENV === 'production';
 
 const mac = new qiniu.auth.digest.Mac(ACCESSKEY, SECRETKEY);
 const qiniu_config = new qiniu.conf.Config({
@@ -16,7 +23,6 @@ const qiniu_config = new qiniu.conf.Config({
 });
 
 async function kodoUpload(filePath: string, fileUrl: string): Promise<any> {
-
   const options = {scope: 'leroy20317', expires: 7200};
   const putPolicy = new qiniu.rs.PutPolicy(options);
   const uploadToken = putPolicy.uploadToken(mac);
@@ -42,7 +48,7 @@ async function kodoUpload(filePath: string, fileUrl: string): Promise<any> {
           } else {
             console.log('kodoUpload', {code: respInfo.statusCode, respBody});
           }
-        }
+        },
     );
   });
 }
@@ -55,7 +61,7 @@ export default class BackupService {
   async handleCron() {
     // 每周自动备份
     this.logger.debug('Called Every Week');
-    if(!isPro){
+    if (!isPro) {
       return;
     }
     await this.backup();
@@ -73,12 +79,13 @@ export default class BackupService {
   // }
 
   backup() {
-    const backUpFolder = isPro? '/wwwroot/mongo-backup' : './mongo-backup';
+    const backUpFolder = isPro ? '/wwwroot/mongo-backup' : './mongo-backup';
 
     // 备份文件名带上日期信息，避免重名，并方便识别
-    const backFileName = formatNow().split(' ')[0]
+    const backFileName = formatNow().split(' ')[0];
 
-    const cmdStr = isPro ? `
+    const cmdStr = isPro
+        ? `
       # 正式环境
       
       # 导出 数据库
@@ -92,7 +99,8 @@ export default class BackupService {
       
       # 删除文件夹，只保留备份的压缩包
       rm -rf ${backFileName}
-    ` : `
+    `
+        : `
       # 测试环境
       
       # 模拟创建数据库文件夹
@@ -106,31 +114,33 @@ export default class BackupService {
       
       # 删除文件夹，只保留备份的压缩包
       rm -rf ${backFileName}
-    `
+    `;
 
     return new Promise((resolve, reject) => {
-      exec(cmdStr, async function(err,stdout,stderr){
+      exec(cmdStr, async function (err, stdout, stderr) {
         // console.log('err,stdout,stderr', {err,stdout,stderr})
-        if(err) {
+        if (err) {
           console.log('cmd error', stderr);
-          reject(stderr)
+          reject(stderr);
         } else {
           console.log('cmd success', stdout);
 
-          const filePath = `${backUpFolder}/${backFileName}.tar.gz`
-          const fileUrl = `mongo-backup/${backFileName}.tar.gz`
+          const filePath = `${backUpFolder}/${backFileName}.tar.gz`;
+          const fileUrl = `mongo-backup/${backFileName}.tar.gz`;
 
           try {
-            await kodoUpload(filePath, fileUrl)
+            await kodoUpload(filePath, fileUrl);
             console.log(`上传文件至 https://cdn.leroy.net.cn/${fileUrl} 成功`);
-            resolve({filename: `${backFileName}.tar.gz`, url: `https://cdn.leroy.net.cn/${fileUrl}`})
-          }catch (e) {
-            console.log('kodo e', e)
-            reject(e)
+            resolve({
+              filename: `${backFileName}.tar.gz`,
+              url: `https://cdn.leroy.net.cn/${fileUrl}`,
+            });
+          } catch (e) {
+            console.log('kodo e', e);
+            reject(e);
           }
         }
       });
-    })
-
+    });
   }
 }

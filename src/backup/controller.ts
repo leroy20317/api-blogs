@@ -1,8 +1,8 @@
-import {Body, Controller, Get, Post,} from '@nestjs/common';
+import {Controller, Get} from '@nestjs/common';
 import {ApiBearerAuth, ApiOperation, ApiTags} from '@nestjs/swagger';
 import {Result} from 'src/utils/util';
 import Service from './service';
-import {NoAuth} from "../auth/customize.decorator";
+import {NoAuth} from '../auth/customize.decorator';
 
 @ApiBearerAuth()
 @Controller('backup/mongo')
@@ -22,5 +22,4 @@ export default class BackUpController {
       body: data,
     };
   }
-
 }
