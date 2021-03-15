@@ -18,7 +18,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe())
 
   // 文档
-  if (!isPro) {
+  // if (!isPro) {
     const options = new DocumentBuilder()
         .addBearerAuth() // 开启 BearerAuth 授权认证
         .setTitle('接口文档')
@@ -27,7 +27,7 @@ async function bootstrap() {
         .build();
     const document = SwaggerModule.createDocument(app, options);
     SwaggerModule.setup('docs', app, document);
-  }
+  // }
 
   // 压缩
   app.use(compression());
