@@ -83,7 +83,7 @@ jobs:
 
       # tar
       - name: Tar dist
-        run: tar zcf build.tar.gz node_modules dist package.json .production.env
+        run: tar zcf build.tar.gz dist package.json package-lock.json .production.env
 
       # Deploy
       - name: Deploy
@@ -109,6 +109,7 @@ jobs:
             rm build.tar.gz
             export NVM_DIR=~/.nvm
             source ~/.nvm/nvm.sh
+            npm i
             pm2 delete api-blogs
             npm run pm2
             echo "Complete!!!"
