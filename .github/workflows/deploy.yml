@@ -27,28 +27,29 @@ jobs:
       # 使用 node:14
       - name: use Node.js 14
         uses: actions/setup-node@v2
+        id: node
         with:
           node-version: '14'
           cache: 'npm'
 
-      # 缓存 node modules
-      - name: Cache node modules
-        uses: actions/cache@v2
-        id: cache
-        env:
-          cache-name: cache-node-modules
-        with:
-          # npm cache files are stored in `~/.npm` on Linux/macOS
-          path: node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+      #      # 缓存 node modules
+      #      - name: Cache node modules
+      #        uses: actions/cache@v2
+      #        id: cache
+      #        env:
+      #          cache-name: cache-node-modules
+      #        with:
+      #          # npm cache files are stored in `~/.npm` on Linux/macOS
+      #          path: node_modules
+      #          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+      #          restore-keys: |
+      #            ${{ runner.os }}-build-${{ env.cache-name }}-
+      #            ${{ runner.os }}-build-
+      #            ${{ runner.os }}-
 
       # npm install
       - name: Install Dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
+        if: steps.node.outputs.cache-hit != 'true'
         run: npm install
 
       # Create .production.env
@@ -76,9 +77,6 @@ jobs:
           echo MONGO_DB="$MONGO_DB" >> .production.env
           echo ACCESSKEY="$ACCESSKEY" >> .production.env
           echo SECRETKEY="$SECRETKEY" >> .production.env
-          
-          echo "cat .production.env"
-          cat .production.env
         shell: bash
 
       # build
