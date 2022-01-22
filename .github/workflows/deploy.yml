@@ -79,7 +79,7 @@ jobs:
           
           echo "cat .production.env"
           cat .production.env
-          shell: bash
+        shell: bash
 
       # build
       - name: Build
