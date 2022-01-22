@@ -64,21 +64,21 @@ jobs:
           MONGO_DB: ${{ secrets.MONGO_DB }}
           ACCESSKEY: ${{ secrets.ACCESSKEY }}
           SECRETKEY: ${{ secrets.SECRETKEY }}
-          run: |
-            touch .production.env
-            echo NODE_ENV="$NODE_ENV" >> .production.env
-            echo PORT="$PORT" >> .production.env
-            echo HOST="$HOST" >> .production.env
-            echo MONGO_PORT="$MONGO_PORT" >> .production.env
-            echo MONGO_USER="$MONGO_USER" >> .production.env
-            echo MONGO_PASSWORD="$MONGO_PASSWORD" >> .production.env
-            echo MONGO_HOST="$MONGO_HOST" >> .production.env
-            echo MONGO_DB="$MONGO_DB" >> .production.env
-            echo ACCESSKEY="$ACCESSKEY" >> .production.env
-            echo SECRETKEY="$SECRETKEY" >> .production.env
-            
-            echo "cat .production.env"
-            cat .production.env
+        run: |
+          touch .production.env
+          echo NODE_ENV="$NODE_ENV" >> .production.env
+          echo PORT="$PORT" >> .production.env
+          echo HOST="$HOST" >> .production.env
+          echo MONGO_PORT="$MONGO_PORT" >> .production.env
+          echo MONGO_USER="$MONGO_USER" >> .production.env
+          echo MONGO_PASSWORD="$MONGO_PASSWORD" >> .production.env
+          echo MONGO_HOST="$MONGO_HOST" >> .production.env
+          echo MONGO_DB="$MONGO_DB" >> .production.env
+          echo ACCESSKEY="$ACCESSKEY" >> .production.env
+          echo SECRETKEY="$SECRETKEY" >> .production.env
+          
+          echo "cat .production.env"
+          cat .production.env
           shell: bash
 
       # build
