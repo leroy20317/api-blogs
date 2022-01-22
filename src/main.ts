@@ -25,15 +25,16 @@ async function bootstrap() {
         .setDescription('document API description')
         .setVersion('1.0')
         .build();
-    const document = SwaggerModule.createDocument(app, options);
-    SwaggerModule.setup('docs', app, document);
+  const document = SwaggerModule.createDocument(app, options);
+  SwaggerModule.setup('docs', app, document);
   // }
 
   // 压缩
   app.use(compression());
 
   await app.listen(PORT, HOST);
-  console.log(`Application is running on: ${await app.getUrl()}`);
+
+  console.log(`Application is running on: http://local.leroy.net.cn:${PORT}`);
 }
 
 bootstrap();
