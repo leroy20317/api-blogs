@@ -111,5 +111,8 @@ jobs:
             cd /wwwroot/api-blogs
             tar zxf build.tar.gz
             rm build.tar.gz
+            export NVM_DIR=~/.nvm
+            source ~/.nvm/nvm.sh
+            pm2 delete api-blogs
             npm run pm2
             echo "Complete!!!"
