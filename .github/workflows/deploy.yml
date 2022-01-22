@@ -87,8 +87,7 @@ jobs:
 
       #      # tar
       - name: Tar dist
-        run: |
-          tar zcf build.tar.gz node_modules dist package.json .production.env
+        run: tar zcf build.tar.gz node_modules dist package.json .production.env
 
       # Deploy
       - name: Deploy
