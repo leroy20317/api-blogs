@@ -21,9 +21,6 @@ npm-debug.log
 # dist
 /dist
 
-# lock
-package-lock.json
-
 #env
 .development.env
 .production.env
