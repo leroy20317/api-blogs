@@ -85,16 +85,18 @@ jobs:
       - name: Tar dist
         run: tar zcf build.tar.gz dist package.json package-lock.json .production.env
 
-      # Deploy
-      - name: Deploy
-        uses: easingthemes/ssh-deploy@v2
+      # Deploy to server
+      - name: Deploy to server
+        id: deploy
+        uses: Pendect/action-rsyncer@v1.1.0
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.ACCESS_TOKEN_PEM }}
-          ARGS: "-avz --delete"
-          SOURCE: "build.tar.gz"
-          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          TARGET: '/wwwroot/api-blogs'
+          DEPLOY_KEY: ${{secrets.ACCESS_TOKEN}}
+        with:
+          flags: '-avzr --delete'
+          options: ''
+          ssh_options: ''
+          src: 'build.tar.gz'
+          dest: '${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:/wwwroot/api-blogs'
 
       # 远程Command
       - name: Command
@@ -112,4 +114,5 @@ jobs:
             npm i
             pm2 delete api-blogs
             npm run pm2
+            pm2 save
             echo "Complete!!!"
