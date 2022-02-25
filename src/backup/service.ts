@@ -79,8 +79,6 @@ export default class BackupService {
   //   this.logger.debug('Called Timeout 5 seconds');
   //   await this.backup();
   // }
-  'mongodump -h 1.116.106.57:20317 -u root -p lx09120317 --authenticationDatabase admin -d blogs --gzip -o /wwwroot/mongo-backup/1'
-  'mongodump -h 1.116.106.57:20317 -d blogs -o /wwwroot/mongo-backup/1'
 
   backup() {
     const backUpFolder = isPro ? '/wwwroot/mongo-backup' : './mongo-backup';
