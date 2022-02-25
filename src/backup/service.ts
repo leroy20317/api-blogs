@@ -11,6 +11,8 @@ const {
   MONGO_PORT,
   MONGO_HOST,
   MONGO_DB,
+  MONGO_USER,
+  MONGO_PASSWORD,
   ACCESSKEY,
   SECRETKEY,
 } = process.env;
@@ -77,6 +79,8 @@ export default class BackupService {
   //   this.logger.debug('Called Timeout 5 seconds');
   //   await this.backup();
   // }
+  'mongodump -h 1.116.106.57:20317 -u root -p lx09120317 --authenticationDatabase admin -d blogs --gzip -o /wwwroot/mongo-backup/1'
+  'mongodump -h 1.116.106.57:20317 -d blogs -o /wwwroot/mongo-backup/1'
 
   backup() {
     const backUpFolder = isPro ? '/wwwroot/mongo-backup' : './mongo-backup';
@@ -89,7 +93,7 @@ export default class BackupService {
       # 正式环境
       
       # 导出 数据库
-      mongodump -h ${MONGO_HOST}:${MONGO_PORT} -d ${MONGO_DB} -o ${backUpFolder}/${backFileName}
+      mongodump -h ${MONGO_HOST}:${MONGO_PORT} -u ${MONGO_USER} -p ${MONGO_PASSWORD} --authenticationDatabase admin -d ${MONGO_DB} -o ${backUpFolder}/${backFileName}
       
       # 进入备份文件夹
       cd ${backUpFolder}
