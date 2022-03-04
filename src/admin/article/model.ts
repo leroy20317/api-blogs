@@ -13,14 +13,8 @@ export default class Article {
   @prop() // 标题
   title: string
 
-  @prop() // 字数
-  words: number
-
   @prop() // md内容
   content: string
-
-  @prop() // 内容源码
-  contentHtml: string
 
   @prop() // 描述
   describe: string

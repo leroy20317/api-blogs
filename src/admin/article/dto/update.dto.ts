@@ -12,14 +12,8 @@ export default class UpdateDto {
   @ApiProperty({description: '标题', required: false})
   title?: string
 
-  @ApiProperty({description: '字数', required: false})
-  words?: number
-
   @ApiProperty({description: '内容md', required: false})
   content?: string
-
-  @ApiProperty({description: '内容html', required: false})
-  contentHtml?: string
 
   @ApiProperty({description: '描述', required: false})
   describe?: string

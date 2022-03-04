@@ -15,7 +15,7 @@ export default class InfoController {
   @Get()
   @ApiOperation({summary: '主页'})
   async index(): Promise<Result> {
-    const [articleLast, articleLength, envelope, commentLength, commentUnread] = await this.service.find();
+    const [articleLast, articleLength, envelope, comments] = await this.service.find();
 
     const data = {
       article: {
@@ -23,10 +23,7 @@ export default class InfoController {
         length: articleLength
       },
       envelope: envelope,
-      comment: {
-        length: commentLength,
-        unread: commentUnread,
-      },
+      comment: comments,
     }
     return {
       status: 'success',

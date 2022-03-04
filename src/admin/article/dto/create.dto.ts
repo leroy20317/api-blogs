@@ -15,17 +15,9 @@ export default class CreateDto {
   @IsNotEmpty({message: '标题不能为空！'})
   title: string
 
-  @ApiProperty({description: '字数'})
-  @IsNotEmpty({message: '字数不能为空！'})
-  words: number
-
   @ApiProperty({description: '内容md'})
   @IsNotEmpty({message: '内容md不能为空！'})
   content: string
-
-  @ApiProperty({description: '内容html'})
-  @IsNotEmpty({message: '内容html不能为空！'})
-  contentHtml: string
 
   @ApiProperty({description: '描述'})
   @IsNotEmpty({message: '描述不能为空！'})
