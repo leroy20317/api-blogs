@@ -1,8 +1,8 @@
 import {Body, Controller, Delete, Get, Param, Post, Put, Query} from '@nestjs/common';
 import {ApiBearerAuth, ApiOperation, ApiTags} from '@nestjs/swagger'
-import ListDto from "./dto/list.dto";
-import CreateDto from "./dto/create.dto";
-import UpdateDto from "./dto/update.dto";
+import List from "./dto/list";
+import Create from "./dto/create";
+import Update from "./dto/update";
 import Service from "./service";
 import VerifyIdPipe from "../../pipe/verify-id.pipe";
 import {Result} from "../../utils/util";
@@ -16,7 +16,7 @@ export default class ArticleController {
 
   @Get()
   @ApiOperation({summary: '列表'})
-  async index(@Query() query: ListDto): Promise<Result> {
+  async index(@Query() query: List): Promise<Result> {
     const data = await this.service.findList(query);
     return {
       status: 'success',
@@ -36,7 +36,7 @@ export default class ArticleController {
 
   @Post()
   @ApiOperation({summary: '创建'})
-  async create(@Body() article: CreateDto): Promise<Result> {
+  async create(@Body() article: Create): Promise<Result> {
     const data = await this.service.create(article);
     return {
       status: 'success',
@@ -47,7 +47,7 @@ export default class ArticleController {
 
   @Put(':id')
   @ApiOperation({summary: '更新'})
-  async update(@Body() article: UpdateDto, @Param('id', new VerifyIdPipe()) id: string): Promise<Result> {
+  async update(@Body() article: Update, @Param('id', new VerifyIdPipe()) id: string): Promise<Result> {
     const data = await this.service.update(id, article);
     return {
       status: 'success',

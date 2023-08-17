@@ -1,6 +1,6 @@
 import {ApiProperty} from "@nestjs/swagger";
 
-export default class ListDto {
+export default class List {
   @ApiProperty({description: '页数', required: false})
   page?: number;
 

@@ -1,8 +1,8 @@
 import {Body, Controller, Delete, Get, Param, Post, Put, Query} from '@nestjs/common';
 import {ApiBearerAuth, ApiOperation, ApiTags} from '@nestjs/swagger'
-import ListDto from "./dto/list.dto";
-import CreateDto from "./dto/create.dto";
-import UpdateDto from "./dto/update.dto";
+import List from "./dto/list";
+import Create from "./dto/create";
+import Update from "./dto/update";
 import Service from "./service";
 import VerifyIdPipe from "../../pipe/verify-id.pipe";
 
@@ -15,7 +15,7 @@ export default class EnvelopController {
 
   @Get()
   @ApiOperation({summary: '列表'})
-  async index(@Query() query: ListDto) {
+  async index(@Query() query: List) {
     const data = await this.service.findList(query);
     return {
       status: 'success',
@@ -35,7 +35,7 @@ export default class EnvelopController {
 
   @Post()
   @ApiOperation({summary: '创建'})
-  async create(@Body() envelop: CreateDto) {
+  async create(@Body() envelop: Create) {
     const data = await this.service.create(envelop);
     return {
       status: 'success',
@@ -46,7 +46,7 @@ export default class EnvelopController {
 
   @Put(':id')
   @ApiOperation({summary: '更新'})
-  async update(@Body() envelop: UpdateDto, @Param('id', new VerifyIdPipe()) id: string) {
+  async update(@Body() envelop: Update, @Param('id', new VerifyIdPipe()) id: string) {
     const data = await this.service.update(id, envelop);
     return {
       status: 'success',

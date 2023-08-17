@@ -10,7 +10,7 @@ class FileDto {
   name?: string
 }
 
-export default class CreateDto {
+export default class Create {
   @ApiProperty({description: '标题'})
   @IsNotEmpty({message: '标题不能为空！'})
   title: string

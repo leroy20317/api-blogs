@@ -8,7 +8,7 @@ class FileDto {
   name?: string
 }
 
-export default class UpdateDto {
+export default class Update {
   @ApiProperty({description: '标题', required: false})
   title?: string
 

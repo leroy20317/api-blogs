@@ -7,7 +7,7 @@ import {APP_GUARD} from "@nestjs/core";
 import {RoleAuthGuard} from "./auth/guard";
 import {ScheduleModule} from '@nestjs/schedule'; // 定时任务
 import BackupModule from "./backup/module";
-
+import ClashModule from "./clash/module"
 const {MONGO_PORT, MONGO_HOST, MONGO_DB, MONGO_USER, MONGO_PASSWORD} = process.env
 
 @Module({
@@ -20,6 +20,7 @@ const {MONGO_PORT, MONGO_HOST, MONGO_DB, MONGO_USER, MONGO_PASSWORD} = process.e
     AdminModule,
     WebModule,
     BackupModule,
+    ClashModule,
     ScheduleModule.forRoot()
   ],
   providers: [

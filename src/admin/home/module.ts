@@ -5,10 +5,9 @@ import Info from "../info/model";
 import Article from "../article/model";
 import Envelope from "../envelope/model";
 import HomeService from './service'
-import Comment from "../comment/model";
 
 @Module({
-  imports: [TypegooseModule.forFeature([Info, Article, Envelope, Comment])],
+  imports: [TypegooseModule.forFeature([Info, Article, Envelope])],
   controllers: [HomeController],
   providers: [HomeService]
 })

@@ -4,7 +4,6 @@ import {ArticleListDto, ListDto} from "./dto/list.dto";
 import Service from "./web.service";
 import VerifyIdPipe from "../pipe/verify-id.pipe";
 import {NoAuth} from "../auth/customize.decorator";
-import {CommentDto, ReplayDto} from "./dto/comment.dto";
 import {Result} from "../utils/util";
 
 @Controller('web')
@@ -83,44 +82,4 @@ export default class WebController {
     }
   }
 
-
-  @NoAuth('never')
-  @Get('comment')
-  @ApiTags('前台/评论')
-  @ApiOperation({summary: '详情'})
-  async commentDetail(@Query('article_id', new VerifyIdPipe()) id: string): Promise<Result> {
-    const data = await this.service.findCommentByArticleId(id);
-    return {
-      status: 'success',
-      body: data
-    }
-  }
-
-
-  @NoAuth('never')
-  @Post('comment')
-  @ApiTags('前台/评论')
-  @ApiOperation({summary: '评论'})
-  async comment(@Query('article_id', new VerifyIdPipe()) id: string, @Body() comment: CommentDto): Promise<Result> {
-    const data = await this.service.comment(id, comment);
-    return {
-      status: 'success',
-      message: '评论成功！',
-      body: data
-    }
-  }
-
-
-  @NoAuth('never')
-  @Post('comment/replay/:id')
-  @ApiTags('前台/评论')
-  @ApiOperation({summary: '回复'})
-  async replay(@Param('id', new VerifyIdPipe()) id: string, @Body() replay: ReplayDto): Promise<Result> {
-    const data = await this.service.replay(id, replay);
-    return {
-      status: 'success',
-      message: '回复成功！',
-      body: data
-    }
-  }
 }

@@ -1,16 +1,16 @@
-import {Module} from '@nestjs/common';
-import {AdminController} from './admin.controller';
+import { Module } from '@nestjs/common';
+import { AdminController } from './admin.controller';
 import HomeModule from './home/module';
 import ArticleModule from './article/module';
 import EnvelopeModule from './envelope/module';
-import AboutModule from "./about/module";
-import InfoModule from "./info/module";
-import CommentModule from "./comment/module";
-import AuthModule from "../auth/auth.module";
+import AboutModule from './about/module';
+import InfoModule from './info/module';
+import AuthModule from '../auth/auth.module';
 import UploadModule from './upload/module';
-import InfoService from "./info/service";
-import {TypegooseModule} from "nestjs-typegoose";
-import Info from "./info/model";
+import InfoService from './info/service';
+import ClashModule from './clash/module';
+import { TypegooseModule } from 'nestjs-typegoose';
+import Info from './info/model';
 
 @Module({
   imports: [
@@ -21,13 +21,10 @@ import Info from "./info/model";
     EnvelopeModule,
     AboutModule,
     InfoModule,
-    CommentModule,
-    UploadModule
+    ClashModule,
+    UploadModule,
   ],
   controllers: [AdminController],
-  providers: [
-    InfoService
-  ]
+  providers: [InfoService],
 })
-export class AdminModule {
-}
+export class AdminModule {}

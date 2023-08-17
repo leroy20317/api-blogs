@@ -1,6 +1,6 @@
 import {ApiProperty} from "@nestjs/swagger";
 
-export default class UpdateDto {
+export default class Update {
 
   @ApiProperty({description: '内容md', required: false})
   content?: string
