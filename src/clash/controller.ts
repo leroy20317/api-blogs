@@ -88,6 +88,7 @@ export default class ClashController {
           // 写入用量
           config['proxy-groups'].unshift({
             name: `🔒 使用统计`,
+            type: 'select',
             proxies: [
               `总量 ${(total / 1024 / 1024 / 1024).toFixed(1)}G`,
               `下行 ${(download / 1024 / 1024 / 1024).toFixed(1)}G`,
