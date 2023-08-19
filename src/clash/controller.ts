@@ -5,6 +5,7 @@ import { NoAuth } from '../auth/customize.decorator';
 import axios from 'axios';
 import * as yaml from 'js-yaml';
 import { Response } from 'express';
+import * as dayjs from 'dayjs';
 
 class ParamsDto {
   @ApiProperty({ description: '订阅链接' })
@@ -57,15 +58,46 @@ export default class ClashController {
         const type = types.find(ele => ele.id === item.type).name;
         const list = [mode, item.site, type];
         if (item.resolve === '0') list.push('no-resolve');
-        return list.filter(ele => !!ele).join(',');
+        return list.join(',');
       });
 
+      // 写入match规则
+      config.rules.push(
+        `${modes.find(ele => ele.id === '7').name},${
+          types.find(ele => ele.id === '12').name
+        }`,
+      );
+
       res.setHeader('Content-Type', headers['content-type'] || 'text/plain');
-      if (headers['subscription-userinfo'])
-        res.setHeader(
-          'Subscription-Userinfo',
-          headers['subscription-userinfo'],
-        );
+      if (headers['subscription-userinfo']) {
+        const { upload, download, total, expire } = headers[
+          'subscription-userinfo'
+        ]
+          .split('; ')
+          .reduce<{
+            upload?: number;
+            download?: number;
+            total?: number;
+            expire?: number;
+          }>((prev, current) => {
+            const [key, value] = current.split('=');
+            prev[key] = Number(value);
+            return prev;
+          }, {});
+        if (upload && download && total && expire) {
+          // 写入用量
+          config['proxy-groups'].unshift({
+            name: `🔒 使用统计`,
+            proxies: [
+              `总量 ${(total / 1024 / 1024 / 1024).toFixed(1)}G`,
+              `下行 ${(download / 1024 / 1024 / 1024).toFixed(1)}G`,
+              `上行 ${(upload / 1024 / 1024 / 1024).toFixed(1)}G`,
+              `过期 ${dayjs(expire * 1000).format('YYYY-MM-DD')}`,
+            ],
+          });
+        }
+      }
+      res.setHeader('Subscription-Userinfo', headers['subscription-userinfo']);
       res.send(yaml.dump(config));
     } catch (err) {
       console.log('err', err);
