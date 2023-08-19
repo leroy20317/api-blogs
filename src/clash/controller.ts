@@ -87,14 +87,16 @@ export default class ClashController {
         if (upload && download && total && expire) {
           // 写入用量
           config['proxy-groups'].push({
-            name: `🔒 使用统计`,
-            type: 'fallback',
-            proxies: [
-              `总量 ${(total / 1024 / 1024 / 1024).toFixed(1)}G`,
-              `下行 ${(download / 1024 / 1024 / 1024).toFixed(1)}G`,
-              `上行 ${(upload / 1024 / 1024 / 1024).toFixed(1)}G`,
-              `过期 ${dayjs(expire * 1000).format('YYYY-MM-DD')}`,
-            ],
+            name: `🔒 使用统计 
+                ${((upload + download) / 1024 / 1024 / 1024).toFixed(1)}G / 
+                ${(total / 1024 / 1024 / 1024).toFixed(1)}G`,
+            type: 'select',
+            proxies: ['REJECT'],
+          });
+          config['proxy-groups'].push({
+            name: `🕒 过期时间 ${dayjs(expire * 1000).format('YYYY-MM-DD')}`,
+            type: 'select',
+            proxies: ['REJECT'],
           });
         }
       }
