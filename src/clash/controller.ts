@@ -86,9 +86,9 @@ export default class ClashController {
           }, {});
         if (upload && download && total && expire) {
           // 写入用量
-          config['proxy-groups'].push({
+          config['proxy-groups'].unshift({
             name: `🔒 使用统计`,
-            type: 'select',
+            type: 'fallback',
             proxies: [
               `总量 ${(total / 1024 / 1024 / 1024).toFixed(1)}G`,
               `下行 ${(download / 1024 / 1024 / 1024).toFixed(1)}G`,
