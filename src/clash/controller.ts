@@ -25,13 +25,14 @@ export default class ClashController {
     }
 
     try {
-      const [{ data }, defaultConfig, rules, types, modes] = await Promise.all([
-        axios.get(query.clashUrl),
-        this.service.findConfig(),
-        this.service.findRuleList(),
-        this.service.findTypeList(),
-        this.service.findModeList(),
-      ]);
+      const [{ data, headers }, defaultConfig, rules, types, modes] =
+        await Promise.all([
+          axios.get(query.clashUrl),
+          this.service.findConfig(),
+          this.service.findRuleList(),
+          this.service.findTypeList(),
+          this.service.findModeList(),
+        ]);
 
       const config = JSON.parse(JSON.stringify(defaultConfig));
       const urlJson: any = yaml.load(data);
@@ -59,7 +60,12 @@ export default class ClashController {
         return list.filter(ele => !!ele).join(',');
       });
 
-      res.setHeader('Content-Type', 'text/plain');
+      res.setHeader('Content-Type', headers['content-type'] || 'text/plain');
+      if (headers['subscription-userinfo'])
+        res.setHeader(
+          'Subscription-Userinfo',
+          headers['subscription-userinfo'],
+        );
       res.send(yaml.dump(config));
     } catch (err) {
       console.log('err', err);
