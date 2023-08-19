@@ -1,78 +1,74 @@
-import {modelOptions, prop} from '@typegoose/typegoose'
+import { modelOptions, prop } from '@typegoose/typegoose';
 
-@modelOptions({ options: { customName: "clash_configs"  } })
+@modelOptions({ options: { customName: 'clash_configs' } })
 export class ClashConfig {
+  @prop()
+  port: number;
 
   @prop()
-  port: number
+  'socks-port': number;
 
   @prop()
-  'socks-port': number
+  'allow-lan': boolean;
 
   @prop()
-  'allow-lan': boolean
+  mode: string;
 
   @prop()
-  mode: string
+  'log-level': string;
 
   @prop()
-  'log-level': string
+  'external-controller': string;
 
   @prop()
-  'external-controller': string
-
-  @prop()
-  proxies: Record<string, any> & {name: string}
+  proxies: Record<string, any> & { name: string };
 
   @prop()
   'proxy-groups': {
     name: string;
     type: string;
     proxies: string[];
-  }[]
+  }[];
 
   @prop()
-  rules: string[]
-
+  rules: string[];
 }
 
-@modelOptions({ options: { customName: "clash_rules" } })
+@modelOptions({ options: { customName: 'clash_rules' } })
 export class ClashRule {
-
   @prop() // 模式
-  mode: number
+  mode: string;
 
   @prop() // 站点
-  site: string
+  site: string;
 
   @prop() // 类型
-  type: number
+  type: string;
 
   @prop() // resolve
-  resolve: boolean
+  resolve: '0' | '1';
 
   @prop() // 备注
-  remark: string
+  remark: string;
 }
 
-@modelOptions({ options: { customName: "clash_modes" } })
+@modelOptions({ options: { customName: 'clash_modes' } })
 export class ClashMode {
   @prop() // id
-  id: number
+  id: string;
 
   @prop() // 模式名称
-  name: string
+  name: string;
 }
 
-
-@modelOptions({ options: { customName: "clash_types" } })
+@modelOptions({ options: { customName: 'clash_types' } })
 export class ClashType {
   @prop() // id
-  id: number
+  id: string;
 
   @prop() // 类型名称
-  name: string
+  name: string;
 
   @prop() // 是否写入规则
-  write: boolean
+  write: boolean;
 }

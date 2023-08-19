@@ -31,8 +31,13 @@ export default class Service {
   }
 
   async findRuleList(query: List): Promise<Page<ClashRuleSchema> | null> {
-    const { page = 1, size = 10 } = query;
-    return getPage(this.ClashRuleModel, page, size);
+    const { page = 1, size = 10, mode, type, site, resolve } = query;
+    const filter: any = {};
+    if (mode) filter.mode = { $in: mode.split(',') };
+    if (site) filter.site = { $regex: site, $options: 'i' };
+    if (type) filter.type = { $in: type.split(',') };
+    if (resolve) filter.resolve = { $in: resolve.split(',') };
+    return getPage(this.ClashRuleModel, page, size, filter, { _id: -1 });
   }
 
   async findRuleById(id: string): Promise<ClashRuleSchema | null> {

@@ -32,7 +32,7 @@ export default class ArticleService {
     return await createdResult.save();
   }
 
-  async update(id: string, article: Update): Promise<ArticleSchema> {
+  async update(id: string, article: ArticleSchema): Promise<ArticleSchema> {
     await this.findById(id);
     return await this.Model.findByIdAndUpdate(id, article, { new: true });
   }
