@@ -84,12 +84,13 @@ export default class ClashController {
             prev[key] = Number(value);
             return prev;
           }, {});
+        const format = num => (num / 1024 / 1024 / 1024).toFixed(1);
         if (upload && download && total && expire) {
           // 写入用量
           config['proxy-groups'].push({
-            name: `🔒 使用统计 
-                ${((upload + download) / 1024 / 1024 / 1024).toFixed(1)}G / 
-                ${(total / 1024 / 1024 / 1024).toFixed(1)}G`,
+            name: `🔒 使用统计 ${format(upload + download)}G / ${format(
+              total,
+            )}G`,
             type: 'select',
             proxies: ['REJECT'],
           });
