@@ -32,6 +32,12 @@ export class ClashConfig {
 
   @prop()
   rules: string[];
+
+  @prop()
+  token: string;
+
+  @prop()
+  clashUrl: string;
 }
 
 @modelOptions({ options: { customName: 'clash_rules' } })
@@ -71,4 +77,10 @@ export class ClashType {
 
   @prop() // 是否写入规则
   write: boolean;
+}
+
+@modelOptions({ options: { customName: 'clash_proxies' } })
+export class ClashProxy {
+  @prop() // name
+  content: Record<string, any>;
 }

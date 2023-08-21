@@ -6,9 +6,12 @@ import axios from 'axios';
 import * as yaml from 'js-yaml';
 import { Response } from 'express';
 import * as dayjs from 'dayjs';
+import { createHash } from 'crypto';
 
 class ParamsDto {
-  @ApiProperty({ description: '订阅链接' })
+  @ApiProperty({ description: 'token' })
+  token: string;
+  @ApiProperty({ description: '订阅链接', required: false })
   clashUrl: string;
 }
 
@@ -21,28 +24,38 @@ export default class ClashController {
   @Get()
   @ApiOperation({ summary: '订阅' })
   async index(@Query() query: ParamsDto, @Res() res: Response): Promise<any> {
-    if (!query.clashUrl) {
+    if (!query.clashUrl && !query.token) {
       throw new HttpException(`clashUrl不能为空`, 500);
     }
 
+    const token =
+      query.token && createHash('sha256').update(query.token).digest('hex');
+    const defaultConfig = await this.service.findConfig();
+
+    const flag = token === defaultConfig.token;
+    const clashUrl = flag ? defaultConfig.clashUrl : query.clashUrl;
     try {
-      const [{ data, headers }, defaultConfig, rules, types, modes] =
+      const [{ data, headers }, rules, types, modes, proxies] =
         await Promise.all([
-          axios.get(query.clashUrl),
-          this.service.findConfig(),
+          axios.get(clashUrl),
           this.service.findRuleList(),
           this.service.findTypeList(),
           this.service.findModeList(),
+          this.service.findProxyList(),
         ]);
-
       const config = JSON.parse(JSON.stringify(defaultConfig));
+      delete config.token;
+      delete config.clashUrl;
       const urlJson: any = yaml.load(data);
 
       // 写入节点
       config.proxies = urlJson.proxies;
+      if (flag && proxies.length > 0) {
+        config.proxies.push(...proxies.map(item => item.content));
+      }
 
       // 节点名称
-      const names = urlJson.proxies.map(item => item.name);
+      const names = config.proxies.map(item => item.name);
 
       // 写入选项
       config['proxy-groups'].forEach(item => {
@@ -104,8 +117,10 @@ export default class ClashController {
       res.setHeader('Subscription-Userinfo', headers['subscription-userinfo']);
       res.send(yaml.dump(config));
     } catch (err) {
-      console.log('err', err);
-      throw new HttpException(`url解析失败`, 500);
+      throw new HttpException(
+        err?.response?.data || err.message || `规则生成失败`,
+        500,
+      );
     }
   }
 }

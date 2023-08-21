@@ -1,13 +1,26 @@
-import {Module} from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import Controller from './controller';
-import {TypegooseModule} from "nestjs-typegoose";
-import {ClashConfig, ClashRule, ClashType, ClashMode} from "../admin/clash/model";
-import Service from './service'
+import { TypegooseModule } from 'nestjs-typegoose';
+import {
+  ClashConfig,
+  ClashRule,
+  ClashType,
+  ClashMode,
+  ClashProxy,
+} from '../admin/clash/model';
+import Service from './service';
 
 @Module({
-  imports: [TypegooseModule.forFeature([ClashConfig, ClashRule, ClashType, ClashMode])],
+  imports: [
+    TypegooseModule.forFeature([
+      ClashConfig,
+      ClashRule,
+      ClashType,
+      ClashMode,
+      ClashProxy,
+    ]),
+  ],
   controllers: [Controller],
-  providers: [Service]
+  providers: [Service],
 })
-export default class ClashModule {
-}
+export default class ClashModule {}
