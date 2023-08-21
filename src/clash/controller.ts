@@ -9,7 +9,7 @@ import * as dayjs from 'dayjs';
 import { createHash } from 'crypto';
 
 class ParamsDto {
-  @ApiProperty({ description: 'token' })
+  @ApiProperty({ description: 'token', required: false })
   token: string;
   @ApiProperty({ description: '订阅链接', required: false })
   clashUrl: string;
