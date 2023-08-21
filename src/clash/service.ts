@@ -44,6 +44,6 @@ export default class Service {
 
   async findProxyList(): Promise<Record<string, any>[]> {
     const proxies = await this.ClashProxyModel.find();
-    return proxies.filter(ele => !!ele).map(ele => ele.content);
+    return proxies.filter(ele => !!ele?.content).map(ele => ele.content);
   }
 }
