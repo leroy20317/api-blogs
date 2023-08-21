@@ -95,7 +95,7 @@ export default class ClashController {
             proxies: ['REJECT'],
           });
           config['proxy-groups'].push({
-            name: `🕒 过期时间 ${dayjs(expire * 1000).format('YYYY-MM-DD')}`,
+            name: `✈️ 过期时间 ${dayjs(expire * 1000).format('YYYY-MM-DD')}`,
             type: 'select',
             proxies: ['REJECT'],
           });
