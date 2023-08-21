@@ -51,7 +51,7 @@ export default class ClashController {
       // 写入节点
       config.proxies = urlJson.proxies;
       if (flag && proxies.length > 0) {
-        config.proxies.push(...proxies.map(item => item.content));
+        config.proxies.push(...proxies);
       }
 
       // 节点名称

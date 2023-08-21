@@ -42,7 +42,8 @@ export default class Service {
     return this.ClashModeModel.find();
   }
 
-  async findProxyList(): Promise<ClashProxySchema[]> {
-    return this.ClashProxyModel.find();
+  async findProxyList(): Promise<Record<string, any>[]> {
+    const proxies = await this.ClashProxyModel.find();
+    return proxies.filter(ele => !!ele).map(ele => ele.content);
   }
 }
