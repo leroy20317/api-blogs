@@ -1,11 +1,11 @@
-import {Injectable, Logger} from '@nestjs/common';
-import {Cron, CronExpression} from '@nestjs/schedule';
+import { Injectable, Logger } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import '../utils/env';
 import * as childProcess from 'child_process';
-import {formatNow} from '../utils/util';
+import { formatNow } from '../utils/util';
 import * as qiniu from 'qiniu';
 
-const {exec} = childProcess;
+const { exec } = childProcess;
 const {
   NODE_ENV,
   MONGO_PORT,
@@ -25,7 +25,7 @@ const qiniu_config = new qiniu.conf.Config({
 });
 
 async function kodoUpload(filePath: string, fileUrl: string): Promise<any> {
-  const options = {scope: 'leroy20317', expires: 7200};
+  const options = { scope: 'leroy20317', expires: 7200 };
   const putPolicy = new qiniu.rs.PutPolicy(options);
   const uploadToken = putPolicy.uploadToken(mac);
 
@@ -34,23 +34,23 @@ async function kodoUpload(filePath: string, fileUrl: string): Promise<any> {
   return new Promise((resolve, reject) => {
     // 文件上传
     formUploader.putFile(
-        uploadToken,
-        fileUrl,
-        filePath,
-        putExtra,
-        function (respErr, respBody, respInfo) {
-          putExtra.mimeType = null; // 重置MIME类型
-          if (respErr) {
-            reject(respErr);
-            throw respErr;
-          }
-          resolve(respBody);
-          if (respInfo.statusCode === 200) {
-            // console.log(respBody);
-          } else {
-            console.log('kodoUpload', {code: respInfo.statusCode, respBody});
-          }
-        },
+      uploadToken,
+      fileUrl,
+      filePath,
+      putExtra,
+      function (respErr, respBody, respInfo) {
+        putExtra.mimeType = null; // 重置MIME类型
+        if (respErr) {
+          reject(respErr);
+          throw respErr;
+        }
+        resolve(respBody);
+        if (respInfo.statusCode === 200) {
+          // console.log(respBody);
+        } else {
+          console.log('kodoUpload', { code: respInfo.statusCode, respBody });
+        }
+      },
     );
   });
 }
@@ -87,7 +87,7 @@ export default class BackupService {
     const backFileName = formatNow().split(' ')[0];
 
     const cmdStr = isPro
-        ? `
+      ? `
       # 正式环境
       
       # 导出 数据库
@@ -102,7 +102,7 @@ export default class BackupService {
       # 删除文件夹，只保留备份的压缩包
       rm -rf ${backFileName}
     `
-        : `
+      : `
       # 测试环境
       
       # 模拟创建数据库文件夹
@@ -132,10 +132,10 @@ export default class BackupService {
 
           try {
             await kodoUpload(filePath, fileUrl);
-            console.log(`上传文件至 https://cdn.leroy.net.cn/${fileUrl} 成功`);
+            console.log(`上传文件至 https://cdn.leroytop.com/${fileUrl} 成功`);
             resolve({
               filename: `${backFileName}.tar.gz`,
-              url: `https://cdn.leroy.net.cn/${fileUrl}`,
+              url: `https://cdn.leroytop.com/${fileUrl}`,
             });
           } catch (e) {
             console.log('kodo e', e);
