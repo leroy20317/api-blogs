@@ -4,12 +4,12 @@ import {
   ClashRule as ClashRuleSchema,
   ClashType as ClashTypeSchema,
   ClashMode as ClashModeSchema,
+  ClashProxy as ClashProxySchema,
 } from './model';
 import { ReturnModelType } from '@typegoose/typegoose';
-import List from './dto/list';
+import { List as RuleList, Edit as RuleEdit } from './dto/rules';
+import { List as ProxyList, Edit as ProxyEdit } from './dto/proxies';
 import { getPage, Page } from '../../utils/util';
-import Create from './dto/create';
-import Update from './dto/update';
 
 @Injectable()
 export default class Service {
@@ -20,6 +20,9 @@ export default class Service {
     private readonly ClashModeModel: ReturnModelType<typeof ClashModeSchema>,
     @InjectModel(ClashTypeSchema)
     private readonly ClashTypeModel: ReturnModelType<typeof ClashTypeSchema>,
+
+    @InjectModel(ClashProxySchema)
+    private readonly ClashProxyModel: ReturnModelType<typeof ClashProxySchema>,
   ) {}
 
   async findTypeList(): Promise<ClashTypeSchema[]> {
@@ -30,7 +33,7 @@ export default class Service {
     return this.ClashModeModel.find();
   }
 
-  async findRuleList(query: List): Promise<Page<ClashRuleSchema> | null> {
+  async findRuleList(query: RuleList): Promise<Page<ClashRuleSchema> | null> {
     const { page = 1, size = 10, mode, type, site, resolve } = query;
     const filter: any = {};
     if (mode) filter.mode = { $in: mode.split(',') };
@@ -48,12 +51,12 @@ export default class Service {
     return data;
   }
 
-  async createRule(rule: Create): Promise<ClashRuleSchema> {
+  async createRule(rule: RuleEdit): Promise<ClashRuleSchema> {
     const createdResult = new this.ClashRuleModel(rule);
     return createdResult.save();
   }
 
-  async updateRule(id: string, rule: Update): Promise<ClashRuleSchema> {
+  async updateRule(id: string, rule: RuleEdit): Promise<ClashRuleSchema> {
     await this.findRuleById(id);
     return this.ClashRuleModel.findByIdAndUpdate(id, rule, { new: true });
   }
@@ -61,5 +64,35 @@ export default class Service {
   async removeRule(id: string): Promise<ClashRuleSchema> {
     await this.findRuleById(id);
     return this.ClashRuleModel.findByIdAndDelete(id);
+  }
+
+  async findProxyList(
+    query: ProxyList,
+  ): Promise<Page<ClashProxySchema> | null> {
+    const { page = 1, size = 10 } = query;
+    return getPage(this.ClashProxyModel, page, size, {}, { _id: -1 });
+  }
+
+  async findProxyById(id: string): Promise<ClashProxySchema | null> {
+    const data = await this.ClashProxyModel.findById(id);
+    if (!data) {
+      throw new HttpException(`id为 ${id} 的代理不存在`, 404);
+    }
+    return data;
+  }
+
+  async createProxy(rule: ProxyEdit): Promise<ClashProxySchema> {
+    const createdResult = new this.ClashProxyModel(rule);
+    return createdResult.save();
+  }
+
+  async updateProxy(id: string, rule: ProxyEdit): Promise<ClashProxySchema> {
+    await this.findProxyById(id);
+    return this.ClashProxyModel.findByIdAndUpdate(id, rule, { new: true });
+  }
+
+  async removeProxy(id: string): Promise<ClashProxySchema> {
+    await this.findProxyById(id);
+    return this.ClashProxyModel.findByIdAndDelete(id);
   }
 }
