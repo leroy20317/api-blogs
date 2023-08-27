@@ -38,6 +38,9 @@ export class ClashConfig {
 
   @prop()
   clashUrl: string;
+
+  @prop()
+  sockboomUrl: string;
 }
 
 @modelOptions({ options: { customName: 'clash_rules' } })

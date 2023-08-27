@@ -7,12 +7,50 @@ import * as yaml from 'js-yaml';
 import { Response } from 'express';
 import * as dayjs from 'dayjs';
 import { createHash } from 'crypto';
+import { Base64 } from 'js-base64';
+
+const SockBoomDecode = str => ({
+  proxies: Base64.decode(str)
+    .split(/\r?\n/)
+    .map(item => {
+      const [type, val] = item.split('://');
+      try {
+        const [server, port, protocol, cipher, obfs, password, paramsStr] =
+          Base64.decode(val).split(/:|\/\?/);
+        const params: Record<string, string> = paramsStr
+          .split('&')
+          .reduce((prev, current) => {
+            const [key, value] = current.split('=');
+            prev[key] = Base64.decode(value);
+            return prev;
+          }, {});
+        return {
+          type,
+          server,
+          port: Number(port),
+          protocol,
+          cipher,
+          obfs,
+          password: Base64.decode(password),
+          name: params.remarks,
+          'protocol-param': params.protoparam,
+          'obfs-param': params.obfsparam,
+          udp: true,
+        };
+      } catch (e) {
+        return undefined;
+      }
+    })
+    .filter(ele => !!ele),
+});
 
 class ParamsDto {
-  @ApiProperty({ description: 'token', required: false })
-  token: string;
   @ApiProperty({ description: '订阅链接', required: false })
   clashUrl: string;
+  @ApiProperty({ description: 'token', required: false })
+  token: string;
+  @ApiProperty({ description: '类型' })
+  type?: 'sockboom';
 }
 
 @Controller('clash')
@@ -32,10 +70,14 @@ export default class ClashController {
       query.token && createHash('sha256').update(query.token).digest('hex');
     const defaultConfig = await this.service.findConfig();
 
-    const flag = token === defaultConfig.token;
-    const clashUrl = flag ? defaultConfig.clashUrl : query.clashUrl;
+    const isMe = token === defaultConfig.token;
+    const clashUrl = isMe
+      ? query.type === 'sockboom'
+        ? defaultConfig.sockboomUrl
+        : defaultConfig.clashUrl
+      : query.clashUrl;
     try {
-      const [{ data, headers }, rules, types, modes, proxies] =
+      const [{ data, headers }, rules, types, modes, customProxies] =
         await Promise.all([
           axios.get(clashUrl),
           this.service.findRuleList(),
@@ -46,12 +88,14 @@ export default class ClashController {
       const config = JSON.parse(JSON.stringify(defaultConfig));
       delete config.token;
       delete config.clashUrl;
-      const urlJson: any = yaml.load(data);
+      delete config.sockboomUrl;
+      const { proxies }: any =
+        query.type === 'sockboom' ? SockBoomDecode(data) : yaml.load(data);
 
       // 写入节点
-      config.proxies = urlJson.proxies;
-      if (flag && proxies.length > 0) {
-        config.proxies.push(...proxies);
+      config.proxies = proxies;
+      if (isMe && customProxies.length > 0) {
+        config.proxies.push(...customProxies);
       }
 
       // 节点名称
