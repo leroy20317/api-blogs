@@ -9,6 +9,7 @@ import * as dayjs from 'dayjs';
 import { createHash } from 'crypto';
 import { Base64 } from 'js-base64';
 
+// 解码sockboom链接
 const SockBoomDecode = str => ({
   proxies: Base64.decode(str)
     .split(/\r?\n/)
@@ -51,6 +52,8 @@ class ParamsDto {
   token: string;
   @ApiProperty({ description: '类型' })
   type?: 'sockboom';
+  @ApiProperty({ description: 'clearCache' })
+  clearCache?: '1';
 }
 
 @Controller('clash')
@@ -76,15 +79,20 @@ export default class ClashController {
         ? defaultConfig.sockboomUrl
         : defaultConfig.clashUrl
       : query.clashUrl;
+
+    console.time('clashUrl');
+    console.time('rules');
     try {
-      const [{ data, headers }, rules, types, modes, customProxies] =
-        await Promise.all([
-          axios.get(clashUrl),
-          this.service.findRuleList(),
-          this.service.findTypeList(),
-          this.service.findModeList(),
-          this.service.findProxyList(),
-        ]);
+      const [{ data, headers }, rules, types, modes] = await Promise.all([
+        axios.get(clashUrl, { timeout: 30000 }).finally(() => {
+          console.timeEnd('clashUrl');
+        }),
+        this.service.findRuleList(query.clearCache).finally(() => {
+          console.timeEnd('rules');
+        }),
+        this.service.findTypeList(),
+        this.service.findModeList(),
+      ]);
       const config = JSON.parse(JSON.stringify(defaultConfig));
       delete config.token;
       delete config.clashUrl;
@@ -94,8 +102,9 @@ export default class ClashController {
 
       // 写入节点
       config.proxies = proxies;
-      if (isMe && customProxies.length > 0) {
-        config.proxies.push(...customProxies);
+      if (isMe) {
+        const customProxies = await this.service.findProxyList();
+        if (customProxies.length > 0) config.proxies.push(...customProxies);
       }
 
       // 节点名称

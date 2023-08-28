@@ -30,8 +30,20 @@ export default class Service {
     return this.ClashConfigModel.findOne();
   }
 
-  async findRuleList(): Promise<ClashRuleSchema[]> {
-    return this.ClashRuleModel.find();
+  async findRuleList(clearCache?: '1'): Promise<ClashRuleSchema[]> {
+    if (clearCache) {
+      delete global['rulesCache'];
+    }
+    const { expire, list } = global['rulesCache'] || {};
+    if (expire && expire > new Date().getTime()) {
+      return list;
+    }
+    const rules = await this.ClashRuleModel.find();
+    global['rulesCache'] = {
+      expire: new Date().getTime() + 24 * 60 * 60 * 60 * 1000,
+      list: rules,
+    };
+    return rules;
   }
 
   async findTypeList(): Promise<ClashTypeSchema[]> {
