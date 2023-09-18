@@ -40,7 +40,7 @@ export default class Service {
     }
     const rules = await this.ClashRuleModel.find();
     global['rulesCache'] = {
-      expire: new Date().getTime() + 24 * 60 * 60 * 60 * 1000,
+      expire: new Date().getTime() + 7 * 24 * 60 * 60 * 60 * 1000,
       list: rules,
     };
     return rules;
