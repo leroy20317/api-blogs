@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from 'nestjs-typegoose';
 import {
   ClashConfig as ClashConfigSchema,
@@ -6,9 +6,8 @@ import {
   SubscribeType as SubscribeTypeSchema,
   SubscribeMode as SubscribeModeSchema,
   SubscribeProxy as SubscribeProxySchema,
-} from '../admin/Subscribe/model';
+} from '../admin/subscribe/model';
 import { ReturnModelType } from '@typegoose/typegoose';
-import { Mode } from './enum';
 
 @Injectable()
 export default class Service {
