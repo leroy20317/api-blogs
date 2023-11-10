@@ -37,14 +37,14 @@ export class ClashConfig {
   token: string;
 
   @prop()
-  clashUrl: string;
-
-  @prop()
-  sockboomUrl: string;
+  fetchUrl: {
+    sockBoom: string;
+    oneDollar: string;
+  };
 }
 
-@modelOptions({ options: { customName: 'clash_rules' } })
-export class ClashRule {
+@modelOptions({ options: { customName: 'subscribe_rules' } })
+export class SubscribeRule {
   @prop() // 模式
   mode: string;
 
@@ -61,8 +61,8 @@ export class ClashRule {
   remark: string;
 }
 
-@modelOptions({ options: { customName: 'clash_modes' } })
-export class ClashMode {
+@modelOptions({ options: { customName: 'subscribe_modes' } })
+export class SubscribeMode {
   @prop() // id
   id: string;
 
@@ -70,8 +70,8 @@ export class ClashMode {
   name: string;
 }
 
-@modelOptions({ options: { customName: 'clash_types' } })
-export class ClashType {
+@modelOptions({ options: { customName: 'subscribe_types' } })
+export class SubscribeType {
   @prop() // id
   id: string;
 
@@ -82,8 +82,8 @@ export class ClashType {
   write: boolean;
 }
 
-@modelOptions({ options: { customName: 'clash_proxies' } })
-export class ClashProxy {
+@modelOptions({ options: { customName: 'subscribe_proxies' } })
+export class SubscribeProxy {
   @prop() // name
   content: Record<string, any>;
 }

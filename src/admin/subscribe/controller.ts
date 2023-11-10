@@ -16,9 +16,9 @@ import { Result } from '../../utils/util';
 import VerifyIdPipe from '../../pipe/verify-id.pipe';
 
 @ApiBearerAuth()
-@Controller('admin/clash')
-@ApiTags('后台/clash订阅')
-export default class ClashController {
+@Controller('admin/subscribe')
+@ApiTags('后台/订阅')
+export default class SubscribeController {
   constructor(private readonly service: Service) {}
 
   @Get('types')

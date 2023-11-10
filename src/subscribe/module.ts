@@ -3,24 +3,24 @@ import Controller from './controller';
 import { TypegooseModule } from 'nestjs-typegoose';
 import {
   ClashConfig,
-  ClashRule,
-  ClashType,
-  ClashMode,
-  ClashProxy,
-} from '../admin/clash/model';
+  SubscribeRule,
+  SubscribeType,
+  SubscribeMode,
+  SubscribeProxy,
+} from '../admin/subscribe/model';
 import Service from './service';
 
 @Module({
   imports: [
     TypegooseModule.forFeature([
       ClashConfig,
-      ClashRule,
-      ClashType,
-      ClashMode,
-      ClashProxy,
+      SubscribeRule,
+      SubscribeType,
+      SubscribeMode,
+      SubscribeProxy,
     ]),
   ],
   controllers: [Controller],
   providers: [Service],
 })
-export default class ClashModule {}
+export default class SubscribeModule {}
