@@ -153,7 +153,7 @@ export default async function handleClash(
         // 写入规则集
         const key = item.site.split(/[\/|.]/).at(-2);
         ruleProviders[key] = {
-          behavior: 'domain',
+          behavior: 'classical',
           type: 'http',
           url: item.site,
           interval: 86400,
