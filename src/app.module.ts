@@ -7,7 +7,6 @@ import { APP_GUARD } from '@nestjs/core';
 import { RoleAuthGuard } from './auth/guard';
 import { ScheduleModule } from '@nestjs/schedule'; // 定时任务
 import BackupModule from './backup/module';
-import SubscribeModule from './subscribe/module';
 const { MONGO_PORT, MONGO_HOST, MONGO_DB, MONGO_USER, MONGO_PASSWORD } =
   process.env;
 
@@ -24,7 +23,6 @@ const { MONGO_PORT, MONGO_HOST, MONGO_DB, MONGO_USER, MONGO_PASSWORD } =
     AdminModule,
     WebModule,
     BackupModule,
-    SubscribeModule,
     ScheduleModule.forRoot(),
   ],
   providers: [
