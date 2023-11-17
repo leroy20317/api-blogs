@@ -16,12 +16,14 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import FileDto from './dto';
-import { diskStorage } from 'multer';
+import * as multer from 'multer';
 import { join } from 'path';
 import * as fs from 'fs';
 import * as qiniu from 'qiniu';
 import { formatNow, Result } from '../../utils/util';
 import '../../utils/env';
+
+const { diskStorage } = multer;
 
 const { NODE_ENV, ACCESSKEY, SECRETKEY } = process.env;
 const isPro = NODE_ENV === 'production';
