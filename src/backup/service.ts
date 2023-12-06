@@ -3,7 +3,7 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import '../utils/env';
 import * as childProcess from 'child_process';
 import { formatNow } from '../utils/util';
-import * as qiniu from 'qiniu';
+import { fileUpload } from '../utils/cdn';
 
 const { exec } = childProcess;
 const {
@@ -13,47 +13,8 @@ const {
   MONGO_DB,
   MONGO_USER,
   MONGO_PASSWORD,
-  ACCESSKEY,
-  SECRETKEY,
 } = process.env;
 const isPro = NODE_ENV === 'production';
-
-const mac = new qiniu.auth.digest.Mac(ACCESSKEY, SECRETKEY);
-const qiniu_config = new qiniu.conf.Config({
-  useCdnDomain: true, // cdn加速
-  zone: qiniu.zone.Zone_z2, // 华南
-});
-
-async function kodoUpload(filePath: string, fileUrl: string): Promise<any> {
-  const options = { scope: 'leroy20317', expires: 7200 };
-  const putPolicy = new qiniu.rs.PutPolicy(options);
-  const uploadToken = putPolicy.uploadToken(mac);
-
-  const formUploader = new qiniu.form_up.FormUploader(qiniu_config);
-  const putExtra = new qiniu.form_up.PutExtra();
-  return new Promise((resolve, reject) => {
-    // 文件上传
-    formUploader.putFile(
-      uploadToken,
-      fileUrl,
-      filePath,
-      putExtra,
-      function (respErr, respBody, respInfo) {
-        putExtra.mimeType = null; // 重置MIME类型
-        if (respErr) {
-          reject(respErr);
-          throw respErr;
-        }
-        resolve(respBody);
-        if (respInfo.statusCode === 200) {
-          // console.log(respBody);
-        } else {
-          console.log('kodoUpload', { code: respInfo.statusCode, respBody });
-        }
-      },
-    );
-  });
-}
 
 @Injectable()
 export default class BackupService {
@@ -127,18 +88,18 @@ export default class BackupService {
         } else {
           console.log('cmd success', stdout);
 
-          const filePath = `${backUpFolder}/${backFileName}.tar.gz`;
+          const localFile = `${backUpFolder}/${backFileName}.tar.gz`;
           const fileUrl = `mongo-backup/${backFileName}.tar.gz`;
 
           try {
-            await kodoUpload(filePath, fileUrl);
+            await fileUpload(fileUrl, localFile);
             console.log(`上传文件至 https://cdn.leroytop.com/${fileUrl} 成功`);
             resolve({
               filename: `${backFileName}.tar.gz`,
               url: `https://cdn.leroytop.com/${fileUrl}`,
             });
           } catch (e) {
-            console.log('kodo e', e);
+            console.log('update backup e', e);
             reject(e);
           }
         }

@@ -27,6 +27,7 @@
     ]
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.465.0",
     "@nestjs/common": "^9.0.5",
     "@nestjs/core": "^9.0.5",
     "@nestjs/jwt": "^7.2.0",
@@ -51,13 +52,13 @@
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
-    "qiniu": "^7.3.2",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.8.1",
     "swagger-ui-express": "^4.1.6"
   },
   "devDependencies": {
+    "@commitlint/config-conventional": "^12.1.4",
     "@nestjs/cli": "^7.5.4",
     "@nestjs/schematics": "^7.2.7",
     "@nestjs/testing": "^7.6.7",
@@ -73,10 +74,9 @@
     "@types/supertest": "^2.0.10",
     "@typescript-eslint/eslint-plugin": "^4.14.1",
     "@typescript-eslint/parser": "^4.14.1",
-    "@commitlint/config-conventional": "^12.1.4",
+    "commitlint": "^12.1.4",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^7.2.0",
-    "commitlint": "^12.1.4",
     "eslint-formatter-pretty": "^5.0.0",
     "eslint-plugin-import": "^2.22.1",
     "husky": "^8.0.3",

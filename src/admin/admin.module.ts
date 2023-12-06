@@ -6,7 +6,7 @@ import EnvelopeModule from './envelope/module';
 import AboutModule from './about/module';
 import InfoModule from './info/module';
 import AuthModule from '../auth/auth.module';
-import UploadModule from './upload/module';
+import FilesModule from './files/module';
 import InfoService from './info/service';
 import { TypegooseModule } from 'nestjs-typegoose';
 import Info from './info/model';
@@ -20,7 +20,7 @@ import Info from './info/model';
     EnvelopeModule,
     AboutModule,
     InfoModule,
-    UploadModule,
+    FilesModule,
   ],
   controllers: [AdminController],
   providers: [InfoService],

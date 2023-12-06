@@ -1,3 +1,4 @@
+import '../../utils/env';
 import {
   BadRequestException,
   Body,
@@ -15,81 +16,22 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import FileDto from './dto';
+import { FileDto, DeleteBodyDto } from './dto';
 import * as multer from 'multer';
 import { join } from 'path';
 import * as fs from 'fs';
-import * as qiniu from 'qiniu';
 import { formatNow, Result } from '../../utils/util';
-import '../../utils/env';
+import { fileUpload, fileDelete } from '../../utils/cdn';
 
 const { diskStorage } = multer;
 
-const { NODE_ENV, ACCESSKEY, SECRETKEY } = process.env;
-const isPro = NODE_ENV === 'production';
-
-const mac = new qiniu.auth.digest.Mac(ACCESSKEY, SECRETKEY);
-const qiniu_config = new qiniu.conf.Config({
-  useCdnDomain: true, // cdn加速
-  zone: qiniu.zone.Zone_z2, // 华南
-});
-
-async function kodoUpload(filePath: string, fileUrl: string): Promise<any> {
-  const options = { scope: 'leroy20317', expires: 7200 };
-  const putPolicy = new qiniu.rs.PutPolicy(options);
-  const uploadToken = putPolicy.uploadToken(mac);
-
-  const formUploader = new qiniu.form_up.FormUploader(qiniu_config);
-  const putExtra = new qiniu.form_up.PutExtra();
-  return new Promise((resolve, reject) => {
-    // 文件上传
-    formUploader.putFile(
-      uploadToken,
-      fileUrl,
-      filePath,
-      putExtra,
-      function (respErr, respBody, respInfo) {
-        putExtra.mimeType = null; // 重置MIME类型
-        if (respErr) {
-          reject(respErr);
-          throw respErr;
-        }
-        resolve(respBody);
-        if (respInfo.statusCode === 200) {
-          // console.log(respBody);
-        } else {
-          console.log(respInfo.statusCode);
-          console.log(respBody);
-        }
-      },
-    );
-  });
-}
-
-async function kodoDelete(fileUrl: string) {
-  const bucketManager = new qiniu.rs.BucketManager(mac, qiniu_config);
-  return new Promise((resolve, reject) => {
-    bucketManager.delete(
-      'leroy20317',
-      fileUrl,
-      function (err, respBody, respInfo) {
-        if (err) {
-          console.log(err);
-          //throw err;
-          reject(err);
-        } else {
-          console.log(respInfo);
-          resolve(respInfo);
-        }
-      },
-    );
-  });
-}
+const isPro = process.env.NODE_ENV === 'production';
+const baseStaticPath = isPro ? '/wwwroot/static/' : join(__dirname, '../../');
 
 @ApiBearerAuth()
 @ApiTags('后台/文件相关')
 @Controller('admin/file')
-export default class UploadController {
+export default class FilesController {
   @Post('upload/:type')
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: FileDto, description: '文件上传' })
@@ -99,9 +41,8 @@ export default class UploadController {
         destination: (req, file, cb) => {
           const name = file.mimetype.includes('image') ? 'image' : 'music';
           const date = formatNow().split(' ')[0];
-          const path = `${
-            isPro ? '/wwwroot/static/uploads' : join(__dirname, '../../uploads')
-          }/${name}/${date}`;
+          const path = `${baseStaticPath}uploads/${name}/${date}`;
+          console.log('path', path);
           if (!fs.existsSync(path)) {
             fs.mkdirSync(path, { recursive: true });
           }
@@ -118,7 +59,7 @@ export default class UploadController {
   )
   async uploadFile(
     @UploadedFile() file: any,
-    @Param('type') type: '1' | '2',
+    @Param('type') type: 'base' | 'cdn',
   ): Promise<Result> {
     if (file.size > 10 * 1024 * 1024) {
       throw new BadRequestException(`文件大小不要超过10M！`);
@@ -133,14 +74,13 @@ export default class UploadController {
     //   path: '/Users/leroy/work/demo/nest-api-blogs/dist/uploads/image/2021-02-02/1574945336javascript.jpg',
     //   size: 29617
     // }
-    const filePath: string = file.path.replace(/\\/g, '/');
-    const fileUrl = filePath.replace(
+    const localFile: string = file.path.replace(/\\/g, '/');
+    const fileUrl = localFile.replace(
       /(.*)\/uploads\/(.*)/,
       (match, $1, $2) => `uploads/${$2}`,
     );
-    const filename = file.filename;
     switch (type) {
-      case '1':
+      case 'base':
         // 服务器
         console.log(`上传文件至 https://static.leroytop.com/${fileUrl} 成功`);
         return {
@@ -148,27 +88,25 @@ export default class UploadController {
           message: '上传成功！',
           body: {
             url: `//static.leroytop.com/${fileUrl}`,
-            filename,
+            filename: file.filename,
           },
         };
-      case '2':
-        // 七牛 KODO
+      case 'cdn':
+        // cdn
         try {
-          await kodoUpload(filePath, fileUrl);
+          await fileUpload(fileUrl, localFile);
           console.log(`上传文件至 https://cdn.leroytop.com/${fileUrl} 成功`);
           return {
             status: 'success',
             message: '上传成功！',
             body: {
               url: `https://cdn.leroytop.com/${fileUrl}`,
-              filename,
+              filename: file.filename,
             },
           };
         } catch (error) {
           console.log(error);
           throw new BadRequestException('上传失败！');
-        } finally {
-          fs.unlinkSync(filePath); // 上传之后删除本地文件
         }
       default:
         throw new BadRequestException(`type: ${type} 上传模式错误！`);
@@ -177,32 +115,35 @@ export default class UploadController {
 
   @Post('delete/:type')
   @ApiOperation({ summary: '删除文件' })
-  async create(
-    @Body('url') url: string,
-    @Param('type') type: '1' | '2',
+  async deleteFile(
+    @Body() body: DeleteBodyDto,
+    @Param('type') type: 'base' | 'cdn',
   ): Promise<Result> {
-    if (!url) {
+    if (!body.url) {
       throw new BadRequestException('文件链接不能为空！');
     }
-    const fileUrl = url.replace(
+    const fileUrl = body.url.replace(
       /(.*)\/uploads\/(.*)/,
       (match, $1, $2) => `uploads/${$2}`,
     );
+    const localFile = `${baseStaticPath}/${fileUrl}`;
     switch (type) {
-      case '1':
+      case 'base':
         // 服务器
-        const filePath = `${
-          isPro ? '/wwwroot/static/' : join(__dirname, '../../')
-        }${fileUrl}`;
-        fs.unlinkSync(filePath);
+        fs.unlinkSync(localFile);
         return {
           status: 'success',
           message: '删除成功！',
         };
-      case '2':
-        // 七牛KODO
+      case 'cdn':
+        // cdn
         try {
-          await kodoDelete(fileUrl);
+          fs.unlinkSync(localFile);
+        } catch (e) {
+          console.log(`delete ${localFile} err`, e);
+        }
+        try {
+          await fileDelete(fileUrl);
           return {
             status: 'success',
             message: '删除成功！',
