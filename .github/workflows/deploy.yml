@@ -119,6 +119,7 @@ jobs:
             export NVM_DIR=~/.nvm
             source ~/.nvm/nvm.sh
             pnpm i
+            pm2 stop api-blogs
             pm2 delete api-blogs
             pnpm run pm2
             pm2 save
