@@ -87,7 +87,7 @@ jobs:
       # Write MongoDB Compose ENV
       - name: Write MongoDB Compose ENV
         run: |
-          sed -i '7,7s/27017:/${{secrets.MONGO_PORT}}:/' ./mongodb/docker-compose.yaml
+          sed -i '/$MONGO_PORT/s/$MONGO_PORT${{secrets.MONGO_PORT}}/' ./mongodb/docker-compose.yaml
           sed -i '/$MONGO_USER/s/$MONGO_USER/${{secrets.MONGO_USER}}/' ./mongodb/docker-compose.yaml
           sed -i '/$MONGO_PASSWORD/s/$MONGO_PASSWORD/${{secrets.MONGO_PASSWORD}}/' ./mongodb/docker-compose.yaml
           sed -i '/$MONGO_DB/s/$MONGO_DB/${{secrets.MONGO_DB}}/' ./mongodb/docker-compose.yaml
