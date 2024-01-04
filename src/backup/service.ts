@@ -6,14 +6,7 @@ import { formatNow } from '../utils/util';
 import { fileUpload } from '../utils/cdn';
 
 const { exec } = childProcess;
-const {
-  NODE_ENV,
-  MONGO_PORT,
-  MONGO_HOST,
-  MONGO_DB,
-  MONGO_USER,
-  MONGO_PASSWORD,
-} = process.env;
+const { NODE_ENV, MONGO_DB, MONGO_USER, MONGO_PASSWORD } = process.env;
 const isPro = NODE_ENV === 'production';
 
 @Injectable()
@@ -42,17 +35,27 @@ export default class BackupService {
   // }
 
   backup() {
-    const backUpFolder = isPro ? '/wwwroot/mongo-backup' : './mongo-backup';
+    const backUpFolder = isPro
+      ? '/wwwroot/api-blogs/mongodb/backup'
+      : './mongo-backup';
 
     // 备份文件名带上日期信息，避免重名，并方便识别
     const backFileName = formatNow().split(' ')[0];
 
+    // 恢复 --drop清空原有数据
+    // mongorestore -h localhost:27017 --drop -d ${MONGO_DB} /backup/${backFileName}/${MONGO_DB}
     const cmdStr = isPro
       ? `
       # 正式环境
       
+      # 进入docker
+      docker exec -it mongodb-container sh
+      
       # 导出 数据库
-      mongodump -h ${MONGO_HOST}:${MONGO_PORT} -u ${MONGO_USER} -p ${MONGO_PASSWORD} --authenticationDatabase admin -d ${MONGO_DB} -o ${backUpFolder}/${backFileName}
+      mongodump -h localhost:27017 -u ${MONGO_USER} -p ${MONGO_PASSWORD} --authenticationDatabase admin -d ${MONGO_DB} -o /backup/${backFileName}
+      
+      # exit
+      exit
       
       # 进入备份文件夹
       cd ${backUpFolder}
