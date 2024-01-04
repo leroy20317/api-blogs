@@ -35,42 +35,18 @@ export default class BackupService {
   // }
 
   backup() {
-    const backUpFolder = isPro
-      ? '/wwwroot/api-blogs/mongodb/backup'
-      : './mongo-backup';
+    const backUpFolder = '/wwwroot/api-blogs/mongodb/backup';
 
     // 备份文件名带上日期信息，避免重名，并方便识别
     const backFileName = formatNow().split(' ')[0];
 
     // 恢复 --drop清空原有数据
     // mongorestore -h localhost:27017 -u ${MONGO_USER} -p ${MONGO_PASSWORD} --authenticationDatabase admin --drop -d ${MONGO_DB} /backup/${backFileName}/${MONGO_DB}
-    const cmdStr = isPro
-      ? `
+    const cmdStr = `
       # 正式环境
       
-      # 进入docker
-      docker exec -it mongodb-container sh
-      
       # 导出 数据库
-      mongodump -h localhost:27017 -u ${MONGO_USER} -p ${MONGO_PASSWORD} --authenticationDatabase admin -d ${MONGO_DB} -o /backup/${backFileName}
-      
-      # exit
-      exit
-      
-      # 进入备份文件夹
-      cd ${backUpFolder}
-      
-      # 压缩导出的数据
-      tar zcvf ${backFileName}.tar.gz ${backFileName}
-      
-      # 删除文件夹，只保留备份的压缩包
-      rm -rf ${backFileName}
-    `
-      : `
-      # 测试环境
-      
-      # 模拟创建数据库文件夹
-      mkdir -p ${backUpFolder}/${backFileName}
+      docker exec mongodb-container /bin/sh -c 'mongodump -h localhost:27017 -u ${MONGO_USER} -p ${MONGO_PASSWORD} --authenticationDatabase admin -d ${MONGO_DB} -o /backup/${backFileName}'
       
       # 进入备份文件夹
       cd ${backUpFolder}
