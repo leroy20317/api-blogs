@@ -35,7 +35,7 @@
     "@nestjs/platform-express": "^9.4.3",
     "@nestjs/schedule": "^2.2.3",
     "@nestjs/swagger": "^7.1.8",
-    "axios": "^0.26.1",
+    "axios": "^1.6.5",
     "class-transformer": "^0.3.2",
     "class-validator": "^0.14.0",
     "co": "^4.6.0",
