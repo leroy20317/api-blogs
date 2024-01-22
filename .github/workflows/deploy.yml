@@ -17,37 +17,37 @@ jobs:
 
       # 切换分支
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       #      # 下载 git submodule
       #      - uses: srt32/git-actions@v0.0.3
       #        with:
       #          args: git submodule update --init --recursive
 
-      # 使用 node:18
-      - name: use Node.js 18
-        uses: actions/setup-node@v2
+      # 使用 node:lts/iron
+      - name: use Node.js lts/iron
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: 'lts/iron'
+          cache: 'npm'
 
       # 缓存 node modules
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@4
         id: cache
         env:
           cache-name: cache-node-modules
         with:
           # npm cache files are stored in `~/.npm` on Linux/macOS
           path: node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          #path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+            ${{ runner.os }}-node-
 
       # npm install
       - name: Install Dependencies
-        if: steps.node.outputs.cache-hit != 'true'
+        if: steps.cache.outputs.cache-hit != 'true'
         run: npm install
 
       # Create .production.env
