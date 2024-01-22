@@ -33,7 +33,7 @@ jobs:
 
       # 缓存 node modules
       - name: Cache node modules
-        uses: actions/cache@4
+        uses: actions/cache@v4
         id: cache
         env:
           cache-name: cache-node-modules
@@ -97,15 +97,14 @@ jobs:
       # Deploy to server
       - name: Deploy to server
         id: deploy
-        uses: Pendect/action-rsyncer@v1.1.0
-        env:
-          DEPLOY_KEY: ${{secrets.ACCESS_TOKEN}}
+        uses: appleboy/scp-action@v0.1.7
         with:
-          flags: '-avzr --delete'
-          options: ''
-          ssh_options: ''
-          src: 'build.tar.gz'
-          dest: '${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:/wwwroot/api-blogs'
+          #host: "foo.com,bar.com"
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.ACCESS_TOKEN }}
+          source: "build.tar.gz"
+          target: /wwwroot/api-blogs
 
       # 远程Command
       - name: Command
