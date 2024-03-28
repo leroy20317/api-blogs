@@ -31,24 +31,32 @@ jobs:
           node-version: 'lts/iron'
           cache: 'npm'
 
-      # 缓存 node modules
-      - name: Cache node modules
-        uses: actions/cache@v4
-        id: cache
-        env:
-          cache-name: cache-node-modules
+      #安装 pnpm
+      - uses: pnpm/action-setup@v3
+        name: Install pnpm
         with:
-          # npm cache files are stored in `~/.npm` on Linux/macOS
-          path: node_modules
-          #path: ${{ steps.npm-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          version: 8
+          run_install: false
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      # 缓存 node modules
+      - uses: actions/cache@v4
+        name: Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-node-
+            ${{ runner.os }}-pnpm-store-
 
       # npm install
       - name: Install Dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: npm install
+        run: |
+          pnpm -v
+          pnpm install
 
       # Create .production.env
       - name: Create .production.env
@@ -88,7 +96,7 @@ jobs:
 
       # build
       - name: Build
-        run: npm run build
+        run: pnpm run build
 
       # tar
       - name: Tar dist
