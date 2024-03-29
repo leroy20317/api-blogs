@@ -100,7 +100,7 @@ jobs:
 
       # tar
       - name: Tar dist
-        run: tar zcf build.tar.gz dist mongodb package.json package-lock.json .production.env
+        run: tar zcf build.tar.gz dist mongodb package.json package-lock.json pnpm-lock.yaml .production.env
 
       # Deploy to server
       - name: Deploy to server
