@@ -19,11 +19,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      #      # 下载 git submodule
-      #      - uses: srt32/git-actions@v0.0.3
-      #        with:
-      #          args: git submodule update --init --recursive
-
       # 使用 node:lts/iron
       - name: use Node.js lts/iron
         uses: actions/setup-node@v4
@@ -127,7 +122,7 @@ jobs:
             rm build.tar.gz
             export NVM_DIR=~/.nvm
             source ~/.nvm/nvm.sh
-            npm i
+            pnpm i
             pm2 stop api-blogs
             pm2 delete api-blogs
             npm run pm2
