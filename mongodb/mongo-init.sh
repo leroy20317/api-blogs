@@ -1,5 +1,5 @@
 # mongodb 6以上使用 mongosh
-mongo -- "$MONGO_INITDB_DATABASE" <<EOF
+mongosh -- "$MONGO_INITDB_DATABASE" <<EOF
 db = db.getSiblingDB('admin')
 db.auth('$MONGO_INITDB_ROOT_USERNAME', '$MONGO_INITDB_ROOT_PASSWORD')
 db = db.getSiblingDB('$MONGO_INITDB_DATABASE')

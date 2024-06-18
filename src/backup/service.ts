@@ -41,12 +41,12 @@ export default class BackupService {
     const backFileName = formatNow().split(' ')[0];
 
     // 恢复 --drop清空原有数据
-    // mongorestore -h localhost:27017 -u ${MONGO_USER} -p ${MONGO_PASSWORD} --authenticationDatabase admin --drop -d ${MONGO_DB} /backup/${backFileName}/${MONGO_DB}
+    // docker exec -it mongodb-container /bin/sh mongorestore -h localhost:27017 -u ${MONGO_USER} -p ${MONGO_PASSWORD} --authenticationDatabase admin --drop -d ${MONGO_DB} /backup/${backFileName}/${MONGO_DB}
     const cmdStr = `
       # 正式环境
       
       # 导出 数据库
-      docker exec mongodb-container /bin/sh -c 'mongodump -h localhost:27017 -u ${MONGO_USER} -p ${MONGO_PASSWORD} --authenticationDatabase admin -d ${MONGO_DB} -o /backup/${backFileName}'
+      docker exec -it mongodb-container /bin/sh -c 'mongodump -h localhost:27017 -u ${MONGO_USER} -p ${MONGO_PASSWORD} --authenticationDatabase admin -d ${MONGO_DB} -o /backup/${backFileName}'
       
       # 进入备份文件夹
       cd ${backUpFolder}
