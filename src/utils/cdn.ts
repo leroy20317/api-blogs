@@ -6,7 +6,7 @@
 
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import * as fs from 'fs';
-import mime from 'mime'
+import * as mime from 'mime-types'
 
 // // 创建 七牛 S3 客户端对象
 const S3 = new S3Client({
@@ -21,7 +21,7 @@ export function fileUpload(key, localFile) {
   return S3.send(
     new PutObjectCommand({
       Bucket: process.env.BUCKET,
-      ContentType: mime.getType(localFile),
+      ContentType: mime.lookup(localFile),
       Key: key,
       Body: fs.createReadStream(localFile),
     }),
