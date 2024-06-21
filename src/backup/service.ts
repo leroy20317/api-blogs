@@ -35,7 +35,7 @@ export default class BackupService {
   // }
 
   backup() {
-    const backUpFolder = '/wwwroot/api-blogs/mongodb/backup';
+    const backUpFolder = '/wwwroot/static/mongo-backup';
 
     // 备份文件名带上日期信息，避免重名，并方便识别
     const backFileName = formatNow().split(' ')[0];

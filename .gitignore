@@ -22,8 +22,7 @@ npm-debug.log
 /dist
 
 #env
-.development.env
-.production.env
+.env
 
 # db
 /mongo-backup

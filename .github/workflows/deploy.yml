@@ -53,8 +53,8 @@ jobs:
           pnpm -v
           pnpm install
 
-      # Create .production.env
-      - name: Create .production.env
+      # Create .env
+      - name: Create .env
         env:
           NODE_ENV: production
           PORT: ${{ secrets.APP_PORT }}
@@ -64,20 +64,26 @@ jobs:
           MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
           MONGO_HOST: ${{ secrets.MONGO_HOST }}
           MONGO_DB: ${{ secrets.MONGO_DB }}
-          ACCESSKEY: ${{ secrets.ACCESSKEY }}
-          SECRETKEY: ${{ secrets.SECRETKEY }}
+          BUCKET: ${{ secrets.BUCKET }}
+          ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
+          SECRET_ACCESS_KEY: ${{ secrets.SECRET_ACCESS_KEY }}
+          ENDPOINT: ${{ secrets.ENDPOINT }}
+          REGION: ${{ secrets.REGION }}
         run: |
-          touch .production.env
-          echo NODE_ENV="$NODE_ENV" >> .production.env
-          echo PORT="$PORT" >> .production.env
-          echo HOST="$HOST" >> .production.env
-          echo MONGO_PORT="$MONGO_PORT" >> .production.env
-          echo MONGO_USER="$MONGO_USER" >> .production.env
-          echo MONGO_PASSWORD="$MONGO_PASSWORD" >> .production.env
-          echo MONGO_HOST="$MONGO_HOST" >> .production.env
-          echo MONGO_DB="$MONGO_DB" >> .production.env
-          echo ACCESSKEY="$ACCESSKEY" >> .production.env
-          echo SECRETKEY="$SECRETKEY" >> .production.env
+          touch .env
+          echo NODE_ENV="$NODE_ENV" >> .env
+          echo PORT="$PORT" >> .env
+          echo HOST="$HOST" >> .env
+          echo MONGO_PORT="$MONGO_PORT" >> .env
+          echo MONGO_USER="$MONGO_USER" >> .env
+          echo MONGO_PASSWORD="$MONGO_PASSWORD" >> .env
+          echo MONGO_HOST="$MONGO_HOST" >> .env
+          echo MONGO_DB="$MONGO_DB" >> .env
+          echo BUCKET="BUCKET" >> .env
+          echo ACCESS_KEY_ID="ACCESS_KEY_ID" >> .env
+          echo SECRET_ACCESS_KEY="SECRET_ACCESS_KEY" >> .env
+          echo ENDPOINT="ENDPOINT" >> .env
+          echo REGION="REGION" >> .env
         shell: bash
 
       # Write MongoDB Compose ENV
