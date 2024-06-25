@@ -15,6 +15,6 @@ services:
       MONGO_PASSWORD: $MONGO_PASSWORD
     volumes:
       - ./mongo_data:/data/db
-      - ./backup:/backup
+      - /wwwroot/static/mongo-backup:/backup
       - ./mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh
 
