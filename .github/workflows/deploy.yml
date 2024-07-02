@@ -86,22 +86,13 @@ jobs:
           echo REGION="REGION" >> .env
         shell: bash
 
-      # Write MongoDB Compose ENV
-      - name: Write MongoDB Compose ENV
-        run: |
-          sed -i 's/$MONGO_PORT/${{secrets.MONGO_PORT}}/' ./mongodb/docker-compose.yaml
-          sed -i 's/$MONGO_USER/${{secrets.MONGO_USER}}/' ./mongodb/docker-compose.yaml
-          sed -i 's/$MONGO_PASSWORD/${{secrets.MONGO_PASSWORD}}/' ./mongodb/docker-compose.yaml
-          sed -i 's/$MONGO_DB/${{secrets.MONGO_DB}}/' ./mongodb/docker-compose.yaml
-        shell: bash
-
       # build
       - name: Build
         run: pnpm run build
 
       # tar
       - name: Tar dist
-        run: tar zcf build.tar.gz dist mongodb package.json package-lock.json pnpm-lock.yaml .env
+        run: tar zcf build.tar.gz dist package.json package-lock.json pnpm-lock.yaml .env
 
       # Deploy to server
       - name: Deploy to server
