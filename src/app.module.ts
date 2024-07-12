@@ -7,13 +7,13 @@ import { APP_GUARD } from '@nestjs/core';
 import { RoleAuthGuard } from './auth/guard';
 import { ScheduleModule } from '@nestjs/schedule'; // 定时任务
 import BackupModule from './backup/module';
-const { MONGO_PORT, MONGO_HOST, MONGO_DB, MONGO_USER, MONGO_PASSWORD } =
+const { MONGO_URL, MONGO_DB, MONGO_USER, MONGO_PASSWORD } =
   process.env;
 
 @Module({
   imports: [
     TypegooseModule.forRoot(
-      `mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST}:${MONGO_PORT}/${MONGO_DB}?authSource=admin`,
+      `mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_URL}/${MONGO_DB}?authSource=admin`,
       {
         useNewUrlParser: true,
         useUnifiedTopology: true,

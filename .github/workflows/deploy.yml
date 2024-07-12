@@ -47,44 +47,29 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
+      # Create .env
+      - name: Create .env
+        run: |
+          touch .env
+          echo NODE_ENV="production" >> .env
+          echo PORT="${{ secrets.APP_PORT }}" >> .env
+          echo HOST="${{ secrets.APP_HOST }}" >> .env
+          echo MONGO_URL="${{ secrets.MONGO_URL }}" >> .env
+          echo MONGO_USER="${{ secrets.MONGO_USER }}" >> .env
+          echo MONGO_PASSWORD="${{ secrets.MONGO_PASSWORD }}" >> .env
+          echo MONGO_DB="${{ secrets.MONGO_DB }}" >> .env
+          echo BUCKET="${{ secrets.BUCKET }}" >> .env
+          echo ACCESS_KEY_ID="${{ secrets.ACCESS_KEY_ID }}" >> .env
+          echo SECRET_ACCESS_KEY="${{ secrets.SECRET_ACCESS_KEY }}" >> .env
+          echo ENDPOINT="${{ secrets.ENDPOINT }}" >> .env
+          echo REGION="${{ secrets.REGION }}" >> .env
+        shell: bash
+
       # npm install
       - name: Install Dependencies
         run: |
           pnpm -v
           pnpm install
-
-      # Create .env
-      - name: Create .env
-        env:
-          NODE_ENV: production
-          PORT: ${{ secrets.APP_PORT }}
-          HOST: ${{ secrets.APP_HOST }}
-          MONGO_PORT: ${{ secrets.MONGO_PORT }}
-          MONGO_USER: ${{ secrets.MONGO_USER }}
-          MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
-          MONGO_HOST: ${{ secrets.MONGO_HOST }}
-          MONGO_DB: ${{ secrets.MONGO_DB }}
-          BUCKET: ${{ secrets.BUCKET }}
-          ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
-          SECRET_ACCESS_KEY: ${{ secrets.SECRET_ACCESS_KEY }}
-          ENDPOINT: ${{ secrets.ENDPOINT }}
-          REGION: ${{ secrets.REGION }}
-        run: |
-          touch .env
-          echo NODE_ENV="$NODE_ENV" >> .env
-          echo PORT="$PORT" >> .env
-          echo HOST="$HOST" >> .env
-          echo MONGO_PORT="$MONGO_PORT" >> .env
-          echo MONGO_USER="$MONGO_USER" >> .env
-          echo MONGO_PASSWORD="$MONGO_PASSWORD" >> .env
-          echo MONGO_HOST="$MONGO_HOST" >> .env
-          echo MONGO_DB="$MONGO_DB" >> .env
-          echo BUCKET="BUCKET" >> .env
-          echo ACCESS_KEY_ID="ACCESS_KEY_ID" >> .env
-          echo SECRET_ACCESS_KEY="SECRET_ACCESS_KEY" >> .env
-          echo ENDPOINT="ENDPOINT" >> .env
-          echo REGION="REGION" >> .env
-        shell: bash
 
       # build
       - name: Build
