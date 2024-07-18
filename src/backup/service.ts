@@ -46,7 +46,7 @@ export default class BackupService {
       # 正式环境
       
       # 导出 数据库
-      docker exec -it mongodb-container /bin/sh -c 'mongodump -h localhost:27017 -u ${MONGO_USER} -p ${MONGO_PASSWORD} --authenticationDatabase admin -d ${MONGO_DB} -o /backup/${backFileName}'
+      docker exec mongodb-container mongodump -h localhost:27017 -u ${MONGO_USER} -p ${MONGO_PASSWORD} --authenticationDatabase admin -d ${MONGO_DB} -o /backup/${backFileName}
       
       # 进入备份文件夹
       cd ${backUpFolder}
