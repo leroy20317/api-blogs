@@ -19,33 +19,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # 使用 node:lts/iron
-      - name: use Node.js lts/iron
-        uses: actions/setup-node@v4
-        with:
-          node-version: 'lts/iron'
-          cache: 'npm'
-
-      #安装 pnpm
-      - uses: pnpm/action-setup@v3
+      - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
-          version: 8
+          version: 9
           run_install: false
 
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      # 缓存 node modules
-      - uses: actions/cache@v4
-        name: Setup pnpm cache
+      # 使用 node:lts/jod
+      - name: use Node.js lts/jod
+        uses: actions/setup-node@v4
         with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          node-version: 'lts/jod'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
 
       # Create .env
       - name: Create .env
@@ -64,12 +52,6 @@ jobs:
           echo ENDPOINT="${{ secrets.ENDPOINT }}" >> .env
           echo REGION="${{ secrets.REGION }}" >> .env
         shell: bash
-
-      # npm install
-      - name: Install Dependencies
-        run: |
-          pnpm -v
-          pnpm install
 
       # build
       - name: Build
